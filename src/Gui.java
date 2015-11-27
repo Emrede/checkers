@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Created by Emre on 11/8/2015.
@@ -14,6 +17,18 @@ public class Gui extends JFrame {
     JPanel optionsPanel = new JPanel();
     int selectedX = 0;
     int selectedY = 0;
+    private JPanel borderPanel;
+    private JPanel flowPanel;
+    public JButton[] buttons;
+
+    private String[] borderConstraints = {
+            BorderLayout.PAGE_START,
+            BorderLayout.LINE_START,
+            BorderLayout.CENTER,
+            BorderLayout.LINE_END,
+            BorderLayout.PAGE_END
+    };
+
 
     public Gui() throws HeadlessException {
         gameGui("GAME");
@@ -22,16 +37,77 @@ public class Gui extends JFrame {
     public void gameGui(String title) {
 
         //super(title);
+        createBoard();
         this.setSize(800, 800);
         this.setTitle(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gridPanel.setLayout(new GridLayout(8, 8));
-        optionsPanel.setLayout(new FlowLayout());
-        createBoard();
-        container.add(gridPanel);
+
+        borderPanel = new JPanel(new BorderLayout());
+        borderPanel.setBorder(BorderFactory.createTitledBorder("BorderLayout"));
+
+        borderPanel.setOpaque(true);
+        borderPanel.setBackground(Color.WHITE);
+        borderPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        //JButton button1 = new JButton(BorderLayout.PAGE_END);
+        //JButton button2 = new JButton(BorderLayout.PAGE_END);
+        //borderPanel.add(button1, BorderLayout.PAGE_END);
+        //borderPanel.add(button2, BorderLayout.PAGE_END);
+        //optionsPanel.setLayout(new FlowLayout());
+        //Defining flow panel
+
+        flowPanel = new JPanel(new FlowLayout(
+                FlowLayout.CENTER, 4, 1));
+        flowPanel.setBorder(
+                BorderFactory.createTitledBorder("Menu"));
+        flowPanel.setOpaque(true);
+        flowPanel.setBackground(Color.lightGray);
+
+        JButton button1 = new JButton("EASY");
+        JButton button2 = new JButton("MEDIUM");
+        JButton button3 = new JButton("HARD");
+        JButton bRules = new JButton("Game Rules");
+        JLabel label = new JLabel("Text Label");
+
+        MouseEvent esd = null;
+        bRules.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            URI uri = new URI("http://www.indepthinfo.com/checkers/play.shtml");
+                            desktop.browse(uri);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        } catch (URISyntaxException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+
+        flowPanel.add(button1);
+        flowPanel.add(button2);
+        flowPanel.add(button3);
+        flowPanel.add(bRules);
+        //flowPanel.add(button5);
+
+
+        flowPanel.add(label);
+
+        borderPanel.add(flowPanel, BorderLayout.SOUTH);
+        borderPanel.add(gridPanel, BorderLayout.CENTER);
+        container.add(borderPanel);
 
         this.setVisible(true);
     }
+
 
     void createBoard() { //create 8x8 grid
         for (int y = 8; y > 0; y--) {
