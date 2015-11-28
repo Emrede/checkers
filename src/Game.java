@@ -18,7 +18,7 @@ public class Game {
         gameGui.refreshTheGui(actualGameState);
         refreshGui();
 
-        ArrayList<Move> movelist = getAllAlowedMoves(actualGameState);
+        ArrayList<Move> movelist = getAllAllowedMoves(actualGameState);
         int i = 0;
         int y;
     }
@@ -34,19 +34,33 @@ public class Game {
     }
 
 
-
-    public static ArrayList<Move> getAllAlowedMoves(GameState gameState) {
+    public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
         ArrayList<Move> nonEatingMoveList = new ArrayList<>();
         ArrayList<Move> eatingMoveList = new ArrayList<>();
-        for (Token token : gameState.tokenList) {//get possible moves for each token on the board
-            if (token.player == gameState.currentPlayer) {//check if the token is from the current player
-                ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, token);//get possible moves for a token
-                if (tmpMoveList != null) {//check if the move list is empty
-                    for (Move move : tmpMoveList) {
-                        if (move.isAnEatingMove) {//check if move is an eating move
-                            eatingMoveList.add(move);
-                        } else {
-                            nonEatingMoveList.add(move);
+        if(gameState.multiStepMoveOnGo) {//check if multistep move in progress
+            ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, gameState.multiStepToken);//get possible moves for a token
+            if (tmpMoveList != null) {//check if the move list is empty
+                for (Move move : tmpMoveList) {
+                    if (move.isAnEatingMove) {//check if move is an eating move
+                        eatingMoveList.add(move);
+                    }
+                }
+            }
+            if(eatingMoveList.isEmpty()){//a mutistep move can only eat.
+                return null;//if no eating moves are possible return null
+            }
+        }
+        else{//no multistep move in progress
+            for (Token token : gameState.tokenList) {//get possible moves for each token on the board
+                if (token.player == gameState.currentPlayer) {//check if the token is from the current player
+                    ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, token);//get possible moves for a token
+                    if (tmpMoveList != null) {//check if the move list is empty
+                        for (Move move : tmpMoveList) {
+                            if (move.isAnEatingMove) {//check if move is an eating move
+                                eatingMoveList.add(move);
+                            } else {
+                                nonEatingMoveList.add(move);
+                            }
                         }
                     }
                 }
@@ -185,36 +199,63 @@ public class Game {
     }
 
 
-    public static boolean move(Token token, int newLocX, int newLocY, Token.TokenPlayer currentPlayer, ArrayList<Token> tokenList) {
-//        if (token.player == currentPlayer) {//is this the right token to move
-//            if (isThereAnyTokenAtLocation(newLocX, newLocY, tokenList)) {//check the next cell
-//                return false;
-//                //moving P1 fw-left and fw-right
-//            } else if (currentPlayer == Token.TokenPlayer.P1 && (token.x - newLocX == 1 && token.y - newLocY == -1) || (token.x - newLocX == -1 && token.y - newLocY == -1)) {
-//                token.x = newLocX;
-//                token.y = newLocY;
-//                return true;
-//                //moving P2 fw-left and fw-right
-//            } else if (currentPlayer == Token.TokenPlayer.P2 && (token.x - newLocX == 1 && token.y - newLocY == 1) || (token.x - newLocX == -1 && token.y - newLocY == 1)) {
-//                token.x = newLocX;
-//                token.y = newLocY;
-//                return true;
-//            }
-//        }
+    //
+    //
 
-        return false;
+    /**
+     * Moves the token to the correct place.
+     * This function does not check if the move is a valid one.
+     * This function changes the current player
+     * This function takes multistep moves in to action and sets the gameState accourdingly
+     *
+     * @param gameState
+     * @param move
+     */
+    public static void move(GameState gameState, Move move) {
+        if (move.isAnEatingMove) {//Eat a token and move
+            Token tokenToBeEaten = isThereAnyTokenAtLocation(move.targetX, move.targetY, gameState.tokenList);
+            if (tokenToBeEaten == null) {//If this is true, something went wrong
+                System.out.println("Move failed. Could not find a token at the target location x:" + move.targetX + " , y:" + move.targetY);
+                return;
+            }
+            //calculate the new location
+            int newX, newY;
+            newX = 2 * tokenToBeEaten.x - move.token.x;
+            newY = 2 * tokenToBeEaten.y - move.token.y;
+            //update the token location
+            move.token.x = newX;
+            move.token.y = newY;
+
+            gameState.tokenList.remove(tokenToBeEaten);//remove the eaten token from the list
+
+            //check if this token can eat another token(multistep)
+            ArrayList<Move> tmpMoveList;
+            tmpMoveList = getPossibleMovesForToken(gameState, move.token);
+            if (tmpMoveList == null) {//no more moves possible
+                gameState.multiStepMoveOnGo = false;//multistep finished or not possible
+                gameState.multiStepToken = null;
+            } else {//check if token can eat more tokens at the new location
+                boolean canEatMore = false;
+                for (Move tmpMove : tmpMoveList) {
+                    if (tmpMove.isAnEatingMove) canEatMore = true;
+                }
+                if (canEatMore) {
+                    gameState.multiStepMoveOnGo = true;//
+                    gameState.multiStepToken = move.token;
+                } else {
+                    gameState.multiStepMoveOnGo = false;//
+                    gameState.multiStepToken = null;
+                    gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
+                }
+            }
+        } else {//move the token
+            move.token.x = move.targetX;
+            move.token.y = move.targetY;
+            gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
+        }
     }
 
     public static Token isThereAnyTokenAtLocation(int newLocX, int newLocY, ArrayList<Token> tokenList) {
-//        Token tTestP1 = new Token(newLocX, newLocY, Token.TokenPlayer.P1, Token.TokenType.Pawn);
-//        Token tTestP2 = new Token(newLocX, newLocY, Token.TokenPlayer.P2, Token.TokenType.Pawn);
-//        Token tTestP1K = new Token(newLocX, newLocY, Token.TokenPlayer.P1, Token.TokenType.King);
-//        Token tTestP2K = new Token(newLocX, newLocY, Token.TokenPlayer.P2, Token.TokenType.King);
-//        if (tokenList.contains(tTestP1) || tokenList.contains(tTestP2) || tokenList.contains(tTestP1K) || tokenList.contains(tTestP2K)) {//Is there any token in new cell?
-//            //System.out.println("There is another token. You can't move to this cell.");
-//            return true;
-//        } else
-//            return false;
 
         for (Token token : tokenList) {
             if (token.x == newLocX && token.y == newLocY) {

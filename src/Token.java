@@ -56,6 +56,13 @@ public class Token {
     }
 
 
+    //returns the opposing player
+    public static TokenPlayer getOpposingPlayer(TokenPlayer p){
+        if(p==TokenPlayer.P1) return TokenPlayer.P2;
+        else return TokenPlayer.P1;
+    }
+
+
 
 }
 

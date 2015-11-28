@@ -9,6 +9,8 @@ public class GameState {
     public Token.TokenPlayer currentPlayer;
     public Token selectedToken;
     public ArrayList<Token> tokenList = new ArrayList<Token>();
+    public boolean multiStepMoveOnGo;
+    public Token multiStepToken;
 
     
     public GameState(ArrayList<Token> tokenList, Token.TokenPlayer currentPlayer){
