@@ -20,6 +20,7 @@ public class Game {
 
         ArrayList<Move> movelist = getAllAlowedMoves(actualGameState);
         int i = 0;
+        int y;
     }
 
     public void refreshGui() {
