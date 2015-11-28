@@ -1,7 +1,13 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Created by Emre on 11/8/2015.
@@ -14,24 +20,145 @@ public class Gui extends JFrame {
     JPanel optionsPanel = new JPanel();
     int selectedX = 0;
     int selectedY = 0;
+    private JPanel borderPanel;
+    private JPanel flowPanel;
+    public JButton[] buttons;
+
+
+    private String[] borderConstraints = {
+            BorderLayout.PAGE_START,
+            BorderLayout.LINE_START,
+            BorderLayout.CENTER,
+            BorderLayout.LINE_END,
+            BorderLayout.PAGE_END
+    };
+
 
     public Gui() throws HeadlessException {
-        gameGui("GAME");
+        gameGui("Checkers");
     }
 
     public void gameGui(String title) {
 
         //super(title);
+        this.setResizable(false);
+        createBoard();
         this.setSize(800, 800);
         this.setTitle(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gridPanel.setLayout(new GridLayout(8, 8));
-        optionsPanel.setLayout(new FlowLayout());
-        createBoard();
-        container.add(gridPanel);
+
+        borderPanel = new JPanel(new BorderLayout());
+        borderPanel.setBorder(BorderFactory.createTitledBorder("BorderLayout"));
+
+        borderPanel.setOpaque(true);
+        borderPanel.setBackground(Color.WHITE);
+        borderPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+        //JButton button1 = new JButton(BorderLayout.PAGE_END);
+        //JButton button2 = new JButton(BorderLayout.PAGE_END);
+        //borderPanel.add(button1, BorderLayout.PAGE_END);
+        //borderPanel.add(button2, BorderLayout.PAGE_END);
+        //optionsPanel.setLayout(new FlowLayout());
+        //Defining flow panel.
+
+        flowPanel = new JPanel(new FlowLayout(
+                FlowLayout.CENTER, 4, 1));
+        flowPanel.setBorder(
+                BorderFactory.createTitledBorder("Options"));
+        flowPanel.setOpaque(true);
+        flowPanel.setBackground(Color.lightGray);
+
+        JButton button1 = new JButton("Easy");
+        JButton button2 = new JButton("Medium");
+        JButton button3 = new JButton("Hard");
+        JButton bRules = new JButton("Game Rules");
+        JLabel labelDif = new JLabel("Difficulty:");
+        JLabel labelInfo = new JLabel("Game Info: ...");
+
+        //Radio buttons for 3 difficulty level. Default: Medium.
+        JRadioButton difEasy = new JRadioButton("Easy");
+        difEasy.setMnemonic(KeyEvent.VK_E);
+        difEasy.setActionCommand("Easy");
+        JRadioButton difMedium = new JRadioButton("Medium");
+        difMedium.setMnemonic(KeyEvent.VK_M);
+        difMedium.setActionCommand("Easy");
+        difMedium.setSelected(true);
+        JRadioButton difHard = new JRadioButton("Hard");
+        difHard.setMnemonic(KeyEvent.VK_H);
+        difHard.setActionCommand("Hard");
+
+        //Group the radio buttons.
+        ButtonGroup group = new ButtonGroup();
+        group.add(difEasy);
+        group.add(difMedium);
+        group.add(difHard);
+
+        // Opens the page with the default internet browser which contains the gameplay info.
+        MouseEvent e = null;
+        bRules.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop desktop = Desktop.getDesktop();
+                        try {
+                            URI uri = new URI("http://www.indepthinfo.com/checkers/play.shtml");
+                            desktop.browse(uri);
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        } catch (URISyntaxException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+
+
+        //Register action listeners for the radio buttons.
+//        difEasy.addActionListener(this);
+//        difMedium.addActionListener(this);
+//        difHard.addActionListener(this);
+
+//        public void actionPerformed(ActionEvent e) {
+//            picture.setIcon(new ImageIcon("images/"
+//                    + e.getActionCommand()
+//                    + ".gif"));}
+
+
+
+
+
+        //flowPanel.add(button1);
+        //flowPanel.add(button2);
+        //flowPanel.add(button3);
+
+        //Adds the buttons and label to the flow panel
+        flowPanel.add(labelDif);
+        flowPanel.add(difEasy);
+        flowPanel.add(difMedium);
+        flowPanel.add(difHard);
+        flowPanel.add(bRules);
+        flowPanel.add(labelInfo);
+
+        //Orders the buttons left to right.
+        flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+        //Puts the flow panel which contains the buttons into the south of a borderpanel.
+        borderPanel.add(flowPanel, BorderLayout.SOUTH);
+        //Puts the gameboard grid panel to the center of a border panel.
+        borderPanel.add(gridPanel, BorderLayout.CENTER);
+        //Adds the border panel into the container.
+        container.add(borderPanel);
 
         this.setVisible(true);
     }
+
 
     void createBoard() { //create 8x8 grid
         for (int y = 8; y > 0; y--) {
