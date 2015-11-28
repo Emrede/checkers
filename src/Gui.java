@@ -174,7 +174,7 @@ public class Gui extends JFrame {
         this.setVisible(true);
     }
 
-    //Create 8x8 grid board.
+    //Create 8x8 grid board
     void createBoard() {
         for (int y = 8; y > 0; y--) {
             for (int x = 1; x < 9; x++) {
