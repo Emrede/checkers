@@ -5,7 +5,7 @@ import java.util.ArrayList;
  */
 
 public class Game {
-
+//
     GameState actualGameState;
     Gui gameGui = new Gui(this);
 
