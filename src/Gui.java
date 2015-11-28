@@ -1,5 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -21,6 +24,7 @@ public class Gui extends JFrame {
     private JPanel flowPanel;
     public JButton[] buttons;
 
+
     private String[] borderConstraints = {
             BorderLayout.PAGE_START,
             BorderLayout.LINE_START,
@@ -31,12 +35,13 @@ public class Gui extends JFrame {
 
 
     public Gui() throws HeadlessException {
-        gameGui("GAME");
+        gameGui("Checkers");
     }
 
     public void gameGui(String title) {
 
         //super(title);
+        this.setResizable(false);
         createBoard();
         this.setSize(800, 800);
         this.setTitle(title);
@@ -55,22 +60,42 @@ public class Gui extends JFrame {
         //borderPanel.add(button1, BorderLayout.PAGE_END);
         //borderPanel.add(button2, BorderLayout.PAGE_END);
         //optionsPanel.setLayout(new FlowLayout());
-        //Defining flow panel
+        //Defining flow panel.
 
         flowPanel = new JPanel(new FlowLayout(
                 FlowLayout.CENTER, 4, 1));
         flowPanel.setBorder(
-                BorderFactory.createTitledBorder("Menu"));
+                BorderFactory.createTitledBorder("Options"));
         flowPanel.setOpaque(true);
         flowPanel.setBackground(Color.lightGray);
 
-        JButton button1 = new JButton("EASY");
-        JButton button2 = new JButton("MEDIUM");
-        JButton button3 = new JButton("HARD");
+        JButton button1 = new JButton("Easy");
+        JButton button2 = new JButton("Medium");
+        JButton button3 = new JButton("Hard");
         JButton bRules = new JButton("Game Rules");
-        JLabel label = new JLabel("Text Label");
+        JLabel labelDif = new JLabel("Difficulty:");
+        JLabel labelInfo = new JLabel("Game Info: ...");
 
-        MouseEvent esd = null;
+        //Radio buttons for 3 difficulty level. Default: Medium.
+        JRadioButton difEasy = new JRadioButton("Easy");
+        difEasy.setMnemonic(KeyEvent.VK_E);
+        difEasy.setActionCommand("Easy");
+        JRadioButton difMedium = new JRadioButton("Medium");
+        difMedium.setMnemonic(KeyEvent.VK_M);
+        difMedium.setActionCommand("Easy");
+        difMedium.setSelected(true);
+        JRadioButton difHard = new JRadioButton("Hard");
+        difHard.setMnemonic(KeyEvent.VK_H);
+        difHard.setActionCommand("Hard");
+
+        //Group the radio buttons.
+        ButtonGroup group = new ButtonGroup();
+        group.add(difEasy);
+        group.add(difMedium);
+        group.add(difHard);
+
+        // Opens the page with the default internet browser which contains the gameplay info.
+        MouseEvent e = null;
         bRules.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -92,17 +117,43 @@ public class Gui extends JFrame {
         });
 
 
-        flowPanel.add(button1);
-        flowPanel.add(button2);
-        flowPanel.add(button3);
+
+
+
+        //Register action listeners for the radio buttons.
+//        difEasy.addActionListener(this);
+//        difMedium.addActionListener(this);
+//        difHard.addActionListener(this);
+
+//        public void actionPerformed(ActionEvent e) {
+//            picture.setIcon(new ImageIcon("images/"
+//                    + e.getActionCommand()
+//                    + ".gif"));}
+
+
+
+
+
+        //flowPanel.add(button1);
+        //flowPanel.add(button2);
+        //flowPanel.add(button3);
+
+        //Adds the buttons and label to the flow panel
+        flowPanel.add(labelDif);
+        flowPanel.add(difEasy);
+        flowPanel.add(difMedium);
+        flowPanel.add(difHard);
         flowPanel.add(bRules);
-        //flowPanel.add(button5);
+        flowPanel.add(labelInfo);
 
+        //Orders the buttons left to right.
+        flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
-        flowPanel.add(label);
-
+        //Puts the flow panel which contains the buttons into the south of a borderpanel.
         borderPanel.add(flowPanel, BorderLayout.SOUTH);
+        //Puts the gameboard grid panel to the center of a border panel.
         borderPanel.add(gridPanel, BorderLayout.CENTER);
+        //Adds the border panel into the container.
         container.add(borderPanel);
 
         this.setVisible(true);
