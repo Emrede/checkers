@@ -9,7 +9,7 @@ public class Token {
     public TokenPlayer player;
     public TokenType tType;
 
-    public enum TokenPlayer {P1, P2};
+    public enum TokenPlayer {P1, P2};//P1:Black/Player  P2:Red/AI
 
     public enum TokenType {King, Pawn};
 
