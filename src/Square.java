@@ -6,17 +6,17 @@ import java.awt.*;
  */
 public class Square extends JPanel {
     boolean isOccupied = false;
-    Token occupand = null;
+    Token occupant = null;
     boolean isHighlighted = false;
 
     public void placeToken(Token token) {
         isOccupied = true;
-        occupand = token;
+        occupant = token;
     }
 
     public void clearToken() {
         isOccupied = false;
-        occupand = null;
+        occupant = null;
     }
 
     public void highlightSquare(boolean state) {
@@ -31,7 +31,7 @@ public class Square extends JPanel {
             int squareHeight = this.getHeight();
             int height = (int) (squareHeight * 0.75);
             int diff = (squareHeight - height) / 2;
-            if (occupand.player == Token.TokenPlayer.P1) {
+            if (occupant.player == Token.TokenPlayer.P1) {
                 g.setColor(Color.black);
             } else {
                 g.setColor(Color.red);
@@ -39,7 +39,7 @@ public class Square extends JPanel {
             g.fillOval(diff, diff, height, height);
 
             //check if the token is a king
-            if (occupand.tType == Token.TokenType.King) {
+            if (occupant.tType == Token.TokenType.King) {
                 height = (int) (squareHeight * 0.45);
                 diff = (squareHeight - height) / 2;
                 g.setColor(Color.orange);

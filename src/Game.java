@@ -7,7 +7,11 @@ import java.util.ArrayList;
 public class Game {
 
     GameState actualGameState;
-    Gui gameGui = new Gui();
+    Gui gameGui = new Gui(this);
+
+    //Difficulty Level Changer: Easy:1  Medium: 2 Hard: 3
+    public int difficultyLevel = 2;//Default: Medium
+    boolean isGamePaused = false;
 
     public Game() {
         restartGame();//create new tokens
@@ -15,8 +19,8 @@ public class Game {
         refreshGui();
     }
 
-    public void refreshGui(){
-         gameGui.refreshTheGui(actualGameState);
+    public void refreshGui() {
+        gameGui.refreshTheGui(actualGameState);
     }
 
     void restartGame() {

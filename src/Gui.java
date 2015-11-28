@@ -1,10 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -12,7 +9,6 @@ import java.net.URISyntaxException;
 /**
  * Created by Emre on 11/8/2015.
  */
-
 
 public class Gui extends JFrame {
     Container container = getContentPane();
@@ -22,20 +18,12 @@ public class Gui extends JFrame {
     int selectedY = 0;
     private JPanel borderPanel;
     private JPanel flowPanel;
-    public JButton[] buttons;
+    Game game;
 
 
-    private String[] borderConstraints = {
-            BorderLayout.PAGE_START,
-            BorderLayout.LINE_START,
-            BorderLayout.CENTER,
-            BorderLayout.LINE_END,
-            BorderLayout.PAGE_END
-    };
-
-
-    public Gui() throws HeadlessException {
+    public Gui(Game instance) throws HeadlessException {
         gameGui("Checkers");
+        game = instance;
     }
 
     public void gameGui(String title) {
@@ -43,25 +31,18 @@ public class Gui extends JFrame {
         //super(title);
         this.setResizable(false);
         createBoard();
-        this.setSize(800, 800);
+        this.setSize(800, 860);
         this.setTitle(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gridPanel.setLayout(new GridLayout(8, 8));
 
         borderPanel = new JPanel(new BorderLayout());
         borderPanel.setBorder(BorderFactory.createTitledBorder("BorderLayout"));
-
         borderPanel.setOpaque(true);
         borderPanel.setBackground(Color.WHITE);
         borderPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        //JButton button1 = new JButton(BorderLayout.PAGE_END);
-        //JButton button2 = new JButton(BorderLayout.PAGE_END);
-        //borderPanel.add(button1, BorderLayout.PAGE_END);
-        //borderPanel.add(button2, BorderLayout.PAGE_END);
-        //optionsPanel.setLayout(new FlowLayout());
         //Defining flow panel.
-
         flowPanel = new JPanel(new FlowLayout(
                 FlowLayout.CENTER, 4, 1));
         flowPanel.setBorder(
@@ -69,33 +50,29 @@ public class Gui extends JFrame {
         flowPanel.setOpaque(true);
         flowPanel.setBackground(Color.lightGray);
 
-        JButton button1 = new JButton("Easy");
-        JButton button2 = new JButton("Medium");
-        JButton button3 = new JButton("Hard");
+        //Initialize the buttons.
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
         JLabel labelInfo = new JLabel("Game Info: ...");
+        JButton pButton = new JButton("Pause");
 
-        //Radio buttons for 3 difficulty level. Default: Medium.
+        //Radio buttons for 3 difficulty level.
         JRadioButton difEasy = new JRadioButton("Easy");
-        difEasy.setMnemonic(KeyEvent.VK_E);
-        difEasy.setActionCommand("Easy");
         JRadioButton difMedium = new JRadioButton("Medium");
-        difMedium.setMnemonic(KeyEvent.VK_M);
-        difMedium.setActionCommand("Easy");
-        difMedium.setSelected(true);
         JRadioButton difHard = new JRadioButton("Hard");
+        difMedium.setSelected(true); //Default difficulty: Medium.
+        //Underlines the first letter and assign a keyboard shortcut(Alt+E).
+        difEasy.setMnemonic(KeyEvent.VK_E);
+        difMedium.setMnemonic(KeyEvent.VK_M);
         difHard.setMnemonic(KeyEvent.VK_H);
-        difHard.setActionCommand("Hard");
 
-        //Group the radio buttons.
+        //Groups the radio buttons.
         ButtonGroup group = new ButtonGroup();
         group.add(difEasy);
         group.add(difMedium);
         group.add(difHard);
 
         // Opens the page with the default internet browser which contains the gameplay info.
-        MouseEvent e = null;
         bRules.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -116,14 +93,59 @@ public class Gui extends JFrame {
             }
         });
 
+        //Radio button listener functions. They change the difficultyLevel.
+        difEasy.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 1;
+                }
+            }
+        });
+
+        difMedium.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 2;
+                }
+            }
+        });
+
+        difHard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 3;
+                }
+            }
+        });
+
+        //Pause button listener.
+        pButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+
+                if (game.isGamePaused == false) {
+                    game.isGamePaused = true;
+                    pButton.setText("Continue");
+
+                } else {
+                    game.isGamePaused = false;
+                    pButton.setText("Pause");
+                }
+            }
+        });
 
 
-
-
-        //Register action listeners for the radio buttons.
-//        difEasy.addActionListener(this);
-//        difMedium.addActionListener(this);
-//        difHard.addActionListener(this);
+//        Register action listeners for the radio buttons.
+        //difEasy.addActionListener();
+        //difMedium.addActionListener();
+        //difHard.addActionListener((ActionListener) difHard);
 
 //        public void actionPerformed(ActionEvent e) {
 //            picture.setIcon(new ImageIcon("images/"
@@ -131,21 +153,14 @@ public class Gui extends JFrame {
 //                    + ".gif"));}
 
 
-
-
-
-        //flowPanel.add(button1);
-        //flowPanel.add(button2);
-        //flowPanel.add(button3);
-
         //Adds the buttons and label to the flow panel
         flowPanel.add(labelDif);
         flowPanel.add(difEasy);
         flowPanel.add(difMedium);
         flowPanel.add(difHard);
         flowPanel.add(bRules);
+        flowPanel.add(pButton);
         flowPanel.add(labelInfo);
-
         //Orders the buttons left to right.
         flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
@@ -159,8 +174,8 @@ public class Gui extends JFrame {
         this.setVisible(true);
     }
 
-
-    void createBoard() { //create 8x8 grid
+    //Create 8x8 grid board.
+    void createBoard() {
         for (int y = 8; y > 0; y--) {
             for (int x = 1; x < 9; x++) {
                 //JPanel square = new JPanel();
@@ -216,11 +231,12 @@ public class Gui extends JFrame {
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
+
         //this.placeToken(x, y);
     }
 
     void refreshTheGui(GameState gameState) {//ArrayList<Token> tokenList
-        //clear the gridPanel
+        //Clears the gridPanel.
         int squareCount = this.gridPanel.getComponentCount();
         for (int i = 0; i < squareCount; i++) {
             Square square = (Square) this.gridPanel.getComponent(i);
@@ -228,15 +244,16 @@ public class Gui extends JFrame {
             square.highlightSquare(false);
         }
 
-        //place the tokens on the grid
+        //Places the tokens on the grid.
         for (Token token : gameState.tokenList) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(token.x, token.y));
             square.placeToken(token);
         }
 
-        //check if square is highlighted
+        //Checks if square is highlighted.
         if (selectedX != 0) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(selectedX, selectedY));
+            //if(selected square == selectedX, selectedY for token.P1 in tokens.P1):
             square.highlightSquare(true);
         }
 
