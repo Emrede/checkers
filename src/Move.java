@@ -7,5 +7,11 @@ public class Move {
     public int targetY;
     public boolean isAnEatingMove;
 
+    public Move(Token token, int targetX, int targetY, boolean isAnEatingMove) {
+        this.token = token;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.isAnEatingMove = isAnEatingMove;
+    }
 
 }
