@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * Created by Emre on 11/8/2015.
@@ -19,6 +20,7 @@ public class Gui extends JFrame {
     private JPanel borderPanel;
     private JPanel flowPanel;
     Game game;
+    int targetX, targetY;
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -53,7 +55,7 @@ public class Gui extends JFrame {
         //Initialize the buttons.
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
-        JLabel labelInfo = new JLabel("Game Info: ...");
+        JLabel labelInfo = new JLabel("Game State: ...");
         JButton pButton = new JButton("Pause");
 
         //Radio buttons for 3 difficulty level.
@@ -166,7 +168,7 @@ public class Gui extends JFrame {
 
         //Puts the flow panel which contains the buttons into the south of a borderpanel.
         borderPanel.add(flowPanel, BorderLayout.SOUTH);
-        //Puts the gameboard grid panel to the center of a border panel.
+        //Puts the game board grid panel to the center of a border panel.
         borderPanel.add(gridPanel, BorderLayout.CENTER);
         //Adds the border panel into the container.
         container.add(borderPanel);
@@ -199,18 +201,18 @@ public class Gui extends JFrame {
         }
     }
 
-    void placeToken(int x, int y) {
-        int squareIndex = getGridIndexFromCoordinates(x, y);
-        Square square = (Square) this.gridPanel.getComponent(squareIndex);
-        square.isOccupied = true;
-        this.gridPanel.updateUI();
-    }
+    //Debug function. Used for test.
+//    void placeToken(int x, int y) {
+//        int squareIndex = getGridIndexFromCoordinates(x, y);
+//        Square square = (Square) this.gridPanel.getComponent(squareIndex);
+//        square.isOccupied = true;
+//        this.gridPanel.updateUI();
+//    }
 
-    //converts x,y coordinates to index of the gridPanel
+    //Converts x,y coordinates to index of the gridPanel
     static int getGridIndexFromCoordinates(int x, int y) {
         int squareIndex;
         squareIndex = 8 - y;
-        //squareIndex -=1;
         squareIndex *= 8;
         squareIndex += x;
         squareIndex -= 1;
@@ -225,12 +227,19 @@ public class Gui extends JFrame {
         String[] coordinateArray;
         int x, y;
         coordinate = panel.getAccessibleContext().getAccessibleName();
+        //Creates coordinate names.
         coordinateArray = coordinate.split(",");
         x = Integer.parseInt(coordinateArray[0]);
         y = Integer.parseInt(coordinateArray[1]);
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
+        Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
+        if (anyToken != null && anyToken.player == Token.TokenPlayer.P1) {
+            game.actualGameState.selectedToken = anyToken;
+            refreshTheGui(game.actualGameState);
+        }
+
 
         //this.placeToken(x, y);
     }
@@ -242,6 +251,7 @@ public class Gui extends JFrame {
             Square square = (Square) this.gridPanel.getComponent(i);
             square.clearToken();
             square.highlightSquare(false);
+            square.greenHighlightSquare(false);
         }
 
         //Places the tokens on the grid.
@@ -251,14 +261,24 @@ public class Gui extends JFrame {
         }
 
         //Checks if square is highlighted.
-        if (selectedX != 0) {
+        if (game.actualGameState.selectedToken != null) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(selectedX, selectedY));
-            //if(selected square == selectedX, selectedY for token.P1 in tokens.P1):
             square.highlightSquare(true);
+            square.greenHighlightSquare(true);
+
+            if (square.isGreenHighlighted == true) {
+                ArrayList<Move> visMoveList = game.getPossibleMovesForToken(gameState, game.actualGameState.selectedToken);
+
+                if (visMoveList != null) {//If null there are no possible moves for this token
+                    for (Move move : visMoveList) {
+                        Square targetSquare = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+                        targetSquare.greenHighlightSquare(true);
+                    }
+                }
+            }
         }
-
         this.gridPanel.updateUI();
-
     }
-
 }
+
+

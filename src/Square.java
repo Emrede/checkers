@@ -8,6 +8,7 @@ public class Square extends JPanel {
     boolean isOccupied = false;
     Token occupant = null;
     boolean isHighlighted = false;
+    boolean isGreenHighlighted = false;
 
     public void placeToken(Token token) {
         isOccupied = true;
@@ -24,13 +25,19 @@ public class Square extends JPanel {
         else isHighlighted = false;
     }
 
+    public void greenHighlightSquare(boolean state) {
+        if (state) isGreenHighlighted = true;
+        else isGreenHighlighted = false;
+    }
+
+
     @Override
     public void paint(Graphics g) {
         super.paint(g);
+        int squareHeight = this.getHeight();
+        int height = (int) (squareHeight * 0.75);
+        int diff = (squareHeight - height) / 2;
         if (this.isOccupied) {
-            int squareHeight = this.getHeight();
-            int height = (int) (squareHeight * 0.75);
-            int diff = (squareHeight - height) / 2;
             if (occupant.player == Token.TokenPlayer.P1) {
                 g.setColor(Color.black);
             } else {
@@ -47,10 +54,19 @@ public class Square extends JPanel {
             }
 
             //check if the square is highlighted
+
             if (isHighlighted) {
                 height = (int) (squareHeight * 0.9);
                 diff = (squareHeight - height) / 2;
                 g.setColor(Color.orange);
+                g.drawRect(diff, diff, height, height);
+            }
+        } else {
+
+            if (isGreenHighlighted) {
+                height = (int) (squareHeight * 0.9);
+                diff = (squareHeight - height) / 2;
+                g.setColor(Color.green);
                 g.drawRect(diff, diff, height, height);
             }
         }

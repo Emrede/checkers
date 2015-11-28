@@ -18,7 +18,7 @@ public class Game {
         gameGui.refreshTheGui(actualGameState);
         refreshGui();
 
-        ArrayList<Move> movelist = getAllAlowedMoves(actualGameState);
+        ArrayList<Move> movelist = getAllAllowedMoves(actualGameState);
         int i = 0;
     }
 
@@ -34,7 +34,7 @@ public class Game {
 
 
 
-    public static ArrayList<Move> getAllAlowedMoves(GameState gameState) {
+    public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
         ArrayList<Move> nonEatingMoveList = new ArrayList<>();
         ArrayList<Move> eatingMoveList = new ArrayList<>();
         for (Token token : gameState.tokenList) {//get possible moves for each token on the board
@@ -65,15 +65,15 @@ public class Game {
     }
 
 
-    //returns possible moves for a token
-    //if no moves are possible return null
+    //Returns possible moves for a token
+    //If no moves are possible return null
     public static ArrayList<Move> getPossibleMovesForToken(GameState gameState, Token token) {
         boolean fl = false, fr = false, bl = false, br = false;
         ArrayList<Move> moveList = new ArrayList<>();
         Move tmpMove;
         Token tmpToken;
 
-        //check for borders
+        //Check for borders
         if (token.x < 8) {
             if (token.y < 8) {
                 fr = true;
@@ -205,15 +205,7 @@ public class Game {
     }
 
     public static Token isThereAnyTokenAtLocation(int newLocX, int newLocY, ArrayList<Token> tokenList) {
-//        Token tTestP1 = new Token(newLocX, newLocY, Token.TokenPlayer.P1, Token.TokenType.Pawn);
-//        Token tTestP2 = new Token(newLocX, newLocY, Token.TokenPlayer.P2, Token.TokenType.Pawn);
-//        Token tTestP1K = new Token(newLocX, newLocY, Token.TokenPlayer.P1, Token.TokenType.King);
-//        Token tTestP2K = new Token(newLocX, newLocY, Token.TokenPlayer.P2, Token.TokenType.King);
-//        if (tokenList.contains(tTestP1) || tokenList.contains(tTestP2) || tokenList.contains(tTestP1K) || tokenList.contains(tTestP2K)) {//Is there any token in new cell?
-//            //System.out.println("There is another token. You can't move to this cell.");
-//            return true;
-//        } else
-//            return false;
+
 
         for (Token token : tokenList) {
             if (token.x == newLocX && token.y == newLocY) {
