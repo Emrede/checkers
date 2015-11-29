@@ -20,9 +20,12 @@ public class Gui extends JFrame {
     int selectedY = 0;
     private JPanel borderPanel;
     private JPanel flowPanel;
+    String infoText = "";
+    JLabel labelInfo = new JLabel("Game State: ...");
     Game game;
     int targetX, targetY;
     Component frame;
+    boolean helpClicked = false;
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -37,7 +40,7 @@ public class Gui extends JFrame {
         createBoard();
         this.setSize(800, 860);
         this.setTitle(title);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         gridPanel.setLayout(new GridLayout(8, 8));
 
         borderPanel = new JPanel(new BorderLayout());
@@ -57,9 +60,9 @@ public class Gui extends JFrame {
         //Initialize the buttons.
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
-        JLabel labelInfo = new JLabel("Game State: ...");
         JButton pauseButton = new JButton("Pause");
         JButton helpButton = new JButton("Help");
+        JButton restartButton = new JButton("Restart");
 
         //Radio buttons for 3 difficulty level.
         JRadioButton difEasy = new JRadioButton("Easy");
@@ -137,10 +140,18 @@ public class Gui extends JFrame {
                     allowedMoves = Game.getAllAllowedMoves(game.actualGameState);
                 else
                     allowedMoves = null;
-
+                helpClicked = true;
                 refreshTheGui(game.actualGameState);
 
 
+            }
+        });
+        restartButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                game.restartGame();
+                refreshTheGui(game.actualGameState);
+                super.mouseClicked(e);
             }
         });
 
@@ -169,6 +180,7 @@ public class Gui extends JFrame {
         flowPanel.add(bRules);
         flowPanel.add(helpButton);
         flowPanel.add(pauseButton);
+        flowPanel.add(restartButton);
         flowPanel.add(labelInfo);
         //Orders the buttons left to right.
         flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -233,6 +245,7 @@ public class Gui extends JFrame {
         String coordinate;
         String[] coordinateArray;
         int x, y;
+        boolean newTokenSelected = false;
         coordinate = panel.getAccessibleContext().getAccessibleName();
         //Creates coordinate names.
         coordinateArray = coordinate.split(",");
@@ -246,19 +259,21 @@ public class Gui extends JFrame {
         tmpMoves = game.getAllAllowedMoves(game.actualGameState);
         if (tmpMoves != null) {
             for (Move move : tmpMoves) {
-                if (move.isAnEatingMove == false) { //If is there any compulsory movement, can't select the token. If not select it.
+                //if (move.isAnEatingMove == false) { //If is there any compulsory movement, can't select the token. If not select it.
                     Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
                     if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
                         game.actualGameState.selectedToken = anyToken; //Select it.
                         game.actualGameState.isAnyTokenSelected = true;
-//                        targetX=0;
-//                        targetY=0;
+                        targetX=0;
+                        targetY=0;
+                        newTokenSelected = true;
+                        infoText = "";
                     }
 //                    else {
 //                        JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
 //                        break;
 //                    }
-                }
+                //}
             }
         }
         //first select: selectedToken and target reset
@@ -269,13 +284,28 @@ public class Gui extends JFrame {
             targetY = y;
            // Move tmpMove=null;
             if (tmpMoves != null) {
+                boolean foundCorrectMove = false;
                 for (Move move : tmpMoves) {
                     if (move.targetX == targetX
                             && move.targetY == targetY
                             && move.token ==game.actualGameState.selectedToken) {
+                        System.out.format("Move. tx=%d  ty=%d to x=%d y=%d", game.actualGameState.selectedToken.x, game.actualGameState.selectedToken.y, targetX , targetY );
                         Move.move(game.actualGameState, move);
-//                    System.out.format("Move. tx=%d  ty=%d to x=\n", x, y);
+                        infoText = "";
+                        foundCorrectMove = true;
+                        game.actualGameState.isAnyTokenSelected = false;
+                        game.actualGameState.selectedToken = null;
+
+                        GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
+                        if(gameResult != GameState.GameResult.Continuue){
+                            if(gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
+                            else infoText = "P2 wins.";
+                        }
                     }
+                }
+                if(!foundCorrectMove && !newTokenSelected){
+                    infoText = "Cannot move there!";
+                    System.out.println("can not move there");
                 }
             }
 //            if (tmpMove != null) {
@@ -303,32 +333,61 @@ public class Gui extends JFrame {
 
         //Checks if square is highlighted.
         if (game.actualGameState.selectedToken != null) {
-            Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(selectedX, selectedY));
+            Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(gameState.selectedToken.x, gameState.selectedToken.y));
             square.highlightSquare(true);
-            square.greenHighlightSquare(true);
+            //square.greenHighlightSquare(true);
 
-            if (square.isGreenHighlighted == true) {
-                ArrayList<Move> visMoveList = game.getPossibleMovesForToken(gameState, game.actualGameState.selectedToken);
+            //if (square.isGreenHighlighted == true) {
+//                ArrayList<Move> visMoveList = game.getPossibleMovesForToken(gameState, game.actualGameState.selectedToken);
+//
+//                if (visMoveList != null) {//If null there are no possible moves for this token
+//                    for (Move move : visMoveList) {
+//                        Square targetSquare = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+//                        targetSquare.greenHighlightSquare(true);
+//
+//                    }
+//                }
 
-                if (visMoveList != null) {//If null there are no possible moves for this token
-                    for (Move move : visMoveList) {
-                        Square targetSquare = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+            //}
+        }
+
+        if(helpClicked){//show all available moves
+            if(allowedMoves != null){
+                for(Move move : allowedMoves){
+                    Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+                    targetSquare.greenHighlightSquare(true);
+                    //targetSquare = null;
+                    targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.token.x, move.token.y));
+                    targetSquare.highlightSquare(true);
+                }
+            }
+            helpClicked = false;//show moves only once
+        }
+        else {//show only selected tokens moves
+            ArrayList<Move> visMoveList = Game.getAllAllowedMoves(gameState);
+            if (visMoveList != null) {
+                for (Move move : visMoveList) {
+                    if (move.token == gameState.selectedToken) {
+                        Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
                         targetSquare.greenHighlightSquare(true);
-
+//                        targetSquare = null;
+//                    targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.token.x, move.token.y));
+//                    targetSquare.highlightSquare(true);
                     }
                 }
+            }
+        }
 
-            }
+
+
+        if(game.actualGameState.currentPlayer== Token.TokenPlayer.P1) {
+            labelInfo.setText("Black moves "+infoText );
         }
-        if (allowedMoves != null) {
-            for (Move move : allowedMoves) {
-                Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
-                targetSquare.greenHighlightSquare(true);
-                targetSquare = null;
-                targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.token.x, move.token.y));
-                targetSquare.highlightSquare(true);
-            }
+        else{
+            labelInfo.setText("Red moves "+infoText );
         }
+
+
         this.gridPanel.updateUI();
     }
 }
