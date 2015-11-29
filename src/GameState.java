@@ -4,7 +4,7 @@ import java.util.ArrayList;
  * Created by Emre on 11/26/2015.
  */
 
-//a game instance
+//A game instance
 public class GameState {
     public Token.TokenPlayer currentPlayer;
     public Token selectedToken;

@@ -37,12 +37,14 @@ public class Game {
     public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
         ArrayList<Move> nonEatingMoveList = new ArrayList<>();
         ArrayList<Move> eatingMoveList = new ArrayList<>();
-        for (Token token : gameState.tokenList) {//get possible moves for each token on the board
-            if (token.player == gameState.currentPlayer) {//check if the token is from the current player
-                ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, token);//get possible moves for a token
-                if (tmpMoveList != null) {//check if the move list is empty
+        //Note: It might be assigned as null here.
+
+        for (Token token : gameState.tokenList) {//Gets possible moves for each token on the board
+            if (token.player == gameState.currentPlayer) {//Checks if the token is from the current player
+                ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, token);//Gets possible moves for a token
+                if (tmpMoveList != null) {//Checks if the move list is empty
                     for (Move move : tmpMoveList) {
-                        if (move.isAnEatingMove) {//check if move is an eating move
+                        if (move.isAnEatingMove) {//Checks if move is an eating move
                             eatingMoveList.add(move);
                         } else {
                             nonEatingMoveList.add(move);

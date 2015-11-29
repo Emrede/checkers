@@ -21,6 +21,7 @@ public class Gui extends JFrame {
     private JPanel flowPanel;
     Game game;
     int targetX, targetY;
+    Component frame;
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -56,7 +57,8 @@ public class Gui extends JFrame {
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
         JLabel labelInfo = new JLabel("Game State: ...");
-        JButton pButton = new JButton("Pause");
+        JButton pauseButton = new JButton("Pause");
+        JButton helpButton = new JButton("Help");
 
         //Radio buttons for 3 difficulty level.
         JRadioButton difEasy = new JRadioButton("Easy");
@@ -127,18 +129,18 @@ public class Gui extends JFrame {
         });
 
         //Pause button listener.
-        pButton.addMouseListener(new MouseAdapter() {
+        pauseButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
 
                 if (game.isGamePaused == false) {
                     game.isGamePaused = true;
-                    pButton.setText("Continue");
+                    pauseButton.setText("Continue");
 
                 } else {
                     game.isGamePaused = false;
-                    pButton.setText("Pause");
+                    pauseButton.setText("Pause");
                 }
             }
         });
@@ -161,7 +163,7 @@ public class Gui extends JFrame {
         flowPanel.add(difMedium);
         flowPanel.add(difHard);
         flowPanel.add(bRules);
-        flowPanel.add(pButton);
+        flowPanel.add(pauseButton);
         flowPanel.add(labelInfo);
         //Orders the buttons left to right.
         flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
@@ -234,12 +236,23 @@ public class Gui extends JFrame {
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
-        Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
-        if (anyToken != null && anyToken.player == Token.TokenPlayer.P1) {
-            game.actualGameState.selectedToken = anyToken;
-            refreshTheGui(game.actualGameState);
-        }
 
+        //Checks all allowed moves and puts them into allowedMoves list.
+        ArrayList<Move> allowedMoves = game.getAllAllowedMoves(game.actualGameState);
+        for (Move move : allowedMoves) {
+            if (move.isAnEatingMove == false) {
+                Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
+                if (anyToken != null && anyToken.player == Token.TokenPlayer.P1) {//If is there a token,
+                    game.actualGameState.selectedToken = anyToken; //Select it.
+                    refreshTheGui(game.actualGameState);
+                } else {
+
+                    JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
+                    break;
+                }
+
+            }
+        }
 
         //this.placeToken(x, y);
     }
