@@ -1,41 +1,33 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 /**
  * Created by Emre on 11/8/2015.
  */
 
-
 public class Gui extends JFrame {
     Container container = getContentPane();
     JPanel gridPanel = new JPanel();
     JPanel optionsPanel = new JPanel();
+    ArrayList<Move> allowedMoves;
     int selectedX = 0;
     int selectedY = 0;
     private JPanel borderPanel;
     private JPanel flowPanel;
-    public JButton[] buttons;
+    Game game;
+    int targetX, targetY;
+    Component frame;
 
 
-    private String[] borderConstraints = {
-            BorderLayout.PAGE_START,
-            BorderLayout.LINE_START,
-            BorderLayout.CENTER,
-            BorderLayout.LINE_END,
-            BorderLayout.PAGE_END
-    };
-
-
-    public Gui() throws HeadlessException {
+    public Gui(Game instance) throws HeadlessException {
         gameGui("Checkers");
+        game = instance;
     }
 
     public void gameGui(String title) {
@@ -43,25 +35,18 @@ public class Gui extends JFrame {
         //super(title);
         this.setResizable(false);
         createBoard();
-        this.setSize(800, 800);
+        this.setSize(800, 860);
         this.setTitle(title);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         gridPanel.setLayout(new GridLayout(8, 8));
 
         borderPanel = new JPanel(new BorderLayout());
         borderPanel.setBorder(BorderFactory.createTitledBorder("BorderLayout"));
-
         borderPanel.setOpaque(true);
         borderPanel.setBackground(Color.WHITE);
         borderPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-        //JButton button1 = new JButton(BorderLayout.PAGE_END);
-        //JButton button2 = new JButton(BorderLayout.PAGE_END);
-        //borderPanel.add(button1, BorderLayout.PAGE_END);
-        //borderPanel.add(button2, BorderLayout.PAGE_END);
-        //optionsPanel.setLayout(new FlowLayout());
         //Defining flow panel.
-
         flowPanel = new JPanel(new FlowLayout(
                 FlowLayout.CENTER, 4, 1));
         flowPanel.setBorder(
@@ -69,33 +54,30 @@ public class Gui extends JFrame {
         flowPanel.setOpaque(true);
         flowPanel.setBackground(Color.lightGray);
 
-        JButton button1 = new JButton("Easy");
-        JButton button2 = new JButton("Medium");
-        JButton button3 = new JButton("Hard");
+        //Initialize the buttons.
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
-        JLabel labelInfo = new JLabel("Game Info: ...");
+        JLabel labelInfo = new JLabel("Game State: ...");
+        JButton pauseButton = new JButton("Pause");
+        JButton helpButton = new JButton("Help");
 
-        //Radio buttons for 3 difficulty level. Default: Medium.
+        //Radio buttons for 3 difficulty level.
         JRadioButton difEasy = new JRadioButton("Easy");
-        difEasy.setMnemonic(KeyEvent.VK_E);
-        difEasy.setActionCommand("Easy");
         JRadioButton difMedium = new JRadioButton("Medium");
-        difMedium.setMnemonic(KeyEvent.VK_M);
-        difMedium.setActionCommand("Easy");
-        difMedium.setSelected(true);
         JRadioButton difHard = new JRadioButton("Hard");
+        difMedium.setSelected(true); //Default difficulty: Medium.
+        //Underlines the first letter and assign a keyboard shortcut(Alt+E).
+        difEasy.setMnemonic(KeyEvent.VK_E);
+        difMedium.setMnemonic(KeyEvent.VK_M);
         difHard.setMnemonic(KeyEvent.VK_H);
-        difHard.setActionCommand("Hard");
 
-        //Group the radio buttons.
+        //Groups the radio buttons.
         ButtonGroup group = new ButtonGroup();
         group.add(difEasy);
         group.add(difMedium);
         group.add(difHard);
 
         // Opens the page with the default internet browser which contains the gameplay info.
-        MouseEvent e = null;
         bRules.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -116,27 +98,68 @@ public class Gui extends JFrame {
             }
         });
 
+        //Radio button listener functions. They change the difficultyLevel.
+        difEasy.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 1;
+                }
+            }
+        });
+
+        difMedium.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 2;
+                }
+            }
+        });
+
+        difHard.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (e.getClickCount() > 0) {
+                    game.difficultyLevel = 3;
+                }
+            }
+        });
+
+        helpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(allowedMoves == null)
+                    allowedMoves = Game.getAllAllowedMoves(game.actualGameState);
+               else
+                    allowedMoves=null;
+
+                refreshTheGui(game.actualGameState);
 
 
+            }
+        });
 
+        //Pause button listener.
+        pauseButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
 
-        //Register action listeners for the radio buttons.
-//        difEasy.addActionListener(this);
-//        difMedium.addActionListener(this);
-//        difHard.addActionListener(this);
+                if (game.isGamePaused == false) {
+                    game.isGamePaused = true;
+                    pauseButton.setText("Continue");
 
-//        public void actionPerformed(ActionEvent e) {
-//            picture.setIcon(new ImageIcon("images/"
-//                    + e.getActionCommand()
-//                    + ".gif"));}
-
-
-
-
-
-        //flowPanel.add(button1);
-        //flowPanel.add(button2);
-        //flowPanel.add(button3);
+                } else {
+                    game.isGamePaused = false;
+                    pauseButton.setText("Pause");
+                }
+            }
+        });
 
         //Adds the buttons and label to the flow panel
         flowPanel.add(labelDif);
@@ -144,14 +167,15 @@ public class Gui extends JFrame {
         flowPanel.add(difMedium);
         flowPanel.add(difHard);
         flowPanel.add(bRules);
+        flowPanel.add(helpButton);
+        flowPanel.add(pauseButton);
         flowPanel.add(labelInfo);
-
         //Orders the buttons left to right.
         flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
         //Puts the flow panel which contains the buttons into the south of a borderpanel.
         borderPanel.add(flowPanel, BorderLayout.SOUTH);
-        //Puts the gameboard grid panel to the center of a border panel.
+        //Puts the game board grid panel to the center of a border panel.
         borderPanel.add(gridPanel, BorderLayout.CENTER);
         //Adds the border panel into the container.
         container.add(borderPanel);
@@ -159,8 +183,8 @@ public class Gui extends JFrame {
         this.setVisible(true);
     }
 
-
-    void createBoard() { //create 8x8 grid
+    //Create 8x8 grid board
+    void createBoard() {
         for (int y = 8; y > 0; y--) {
             for (int x = 1; x < 9; x++) {
                 //JPanel square = new JPanel();
@@ -184,18 +208,18 @@ public class Gui extends JFrame {
         }
     }
 
-    void placeToken(int x, int y) {
-        int squareIndex = getGridIndexFromCoordinates(x, y);
-        Square square = (Square) this.gridPanel.getComponent(squareIndex);
-        square.isOccupied = true;
-        this.gridPanel.updateUI();
-    }
+    //Debug function. Used for test.
+//    void placeToken(int x, int y) {
+//        int squareIndex = getGridIndexFromCoordinates(x, y);
+//        Square square = (Square) this.gridPanel.getComponent(squareIndex);
+//        square.isOccupied = true;
+//        this.gridPanel.updateUI();
+//    }
 
-    //converts x,y coordinates to index of the gridPanel
+    //Converts x,y coordinates to index of the gridPanel
     static int getGridIndexFromCoordinates(int x, int y) {
         int squareIndex;
         squareIndex = 8 - y;
-        //squareIndex -=1;
         squareIndex *= 8;
         squareIndex += x;
         squareIndex -= 1;
@@ -210,38 +234,76 @@ public class Gui extends JFrame {
         String[] coordinateArray;
         int x, y;
         coordinate = panel.getAccessibleContext().getAccessibleName();
+        //Creates coordinate names.
         coordinateArray = coordinate.split(",");
         x = Integer.parseInt(coordinateArray[0]);
         y = Integer.parseInt(coordinateArray[1]);
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
-        //this.placeToken(x, y);
-    }
 
+        //Checks all allowed moves and puts them into allowedMoves list.
+        ArrayList<Move> allowedMoves = game.getAllAllowedMoves(game.actualGameState);
+        for (Move move : allowedMoves) {
+            if (move.isAnEatingMove == false) {
+                Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
+                if (anyToken != null && anyToken.player == Token.TokenPlayer.P1) {//If is there a token,
+                    game.actualGameState.selectedToken = anyToken; //Select it.
+                    refreshTheGui(game.actualGameState);
+                } else {
+
+                    JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
+                    break;
+                }
+            }
+        }
+    }
     void refreshTheGui(GameState gameState) {//ArrayList<Token> tokenList
-        //clear the gridPanel
+        //Clears the gridPanel.
         int squareCount = this.gridPanel.getComponentCount();
         for (int i = 0; i < squareCount; i++) {
             Square square = (Square) this.gridPanel.getComponent(i);
             square.clearToken();
             square.highlightSquare(false);
+            square.greenHighlightSquare(false);
         }
 
-        //place the tokens on the grid
+        //Places the tokens on the grid.
         for (Token token : gameState.tokenList) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(token.x, token.y));
             square.placeToken(token);
         }
 
-        //check if square is highlighted
-        if (selectedX != 0) {
+        //Checks if square is highlighted.
+        if (game.actualGameState.selectedToken != null) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(selectedX, selectedY));
             square.highlightSquare(true);
+            square.greenHighlightSquare(true);
+
+            if (square.isGreenHighlighted == true) {
+                ArrayList<Move> visMoveList = game.getPossibleMovesForToken(gameState, game.actualGameState.selectedToken);
+
+                if (visMoveList != null) {//If null there are no possible moves for this token
+                    for (Move move : visMoveList) {
+                        Square targetSquare = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+                        targetSquare.greenHighlightSquare(true);
+
+                    }
+                }
+
+            }
         }
-
+        if (allowedMoves != null) {
+            for (Move move : allowedMoves) {
+                Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+                targetSquare.greenHighlightSquare(true);
+                targetSquare = null;
+                targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.token.x, move.token.y));
+                targetSquare.highlightSquare(true);
+            }
+        }
         this.gridPanel.updateUI();
-
     }
-
 }
+
+
