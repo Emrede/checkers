@@ -133,10 +133,10 @@ public class Gui extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if(allowedMoves == null)
+                if (allowedMoves == null)
                     allowedMoves = Game.getAllAllowedMoves(game.actualGameState);
-               else
-                    allowedMoves=null;
+                else
+                    allowedMoves = null;
 
                 refreshTheGui(game.actualGameState);
 
@@ -241,23 +241,50 @@ public class Gui extends JFrame {
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
-
+        ArrayList<Move> tmpMoves;
         //Checks all allowed moves and puts them into allowedMoves list.
-        ArrayList<Move> allowedMoves = game.getAllAllowedMoves(game.actualGameState);
-        for (Move move : allowedMoves) {
-            if (move.isAnEatingMove == false) {
-                Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
-                if (anyToken != null && anyToken.player == Token.TokenPlayer.P1) {//If is there a token,
-                    game.actualGameState.selectedToken = anyToken; //Select it.
-                    refreshTheGui(game.actualGameState);
-                } else {
-
-                    JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
-                    break;
+        tmpMoves = game.getAllAllowedMoves(game.actualGameState);
+        if (tmpMoves != null) {
+            for (Move move : tmpMoves) {
+                if (move.isAnEatingMove == false) { //If is there any compulsory movement, can't select the token. If not select it.
+                    Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
+                    if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
+                        game.actualGameState.selectedToken = anyToken; //Select it.
+                        game.actualGameState.isAnyTokenSelected = true;
+//                        targetX=0;
+//                        targetY=0;
+                    }
+//                    else {
+//                        JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
+//                        break;
+//                    }
                 }
             }
         }
+        //first select: selectedToken and target reset
+        //second select: target x,y
+        //if availMoves contains a move with selected token and target move
+        if (game.actualGameState.isAnyTokenSelected) {
+            targetX = x;
+            targetY = y;
+           // Move tmpMove=null;
+            if (tmpMoves != null) {
+                for (Move move : tmpMoves) {
+                    if (move.targetX == targetX
+                            && move.targetY == targetY
+                            && move.token ==game.actualGameState.selectedToken) {
+                        Move.move(game.actualGameState, move);
+//                    System.out.format("Move. tx=%d  ty=%d to x=\n", x, y);
+                    }
+                }
+            }
+//            if (tmpMove != null) {
+//
+//            }
+        }
+        refreshTheGui(game.actualGameState);
     }
+
     void refreshTheGui(GameState gameState) {//ArrayList<Token> tokenList
         //Clears the gridPanel.
         int squareCount = this.gridPanel.getComponentCount();

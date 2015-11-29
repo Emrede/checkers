@@ -12,6 +12,7 @@ public class GameState {
     public Token selectedToken;
     public ArrayList<Token> tokenList = new ArrayList<Token>();
     public boolean multiStepMoveOnGo;
+    public boolean isAnyTokenSelected = false;
     public Token multiStepToken;
 
     
