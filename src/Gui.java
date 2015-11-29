@@ -15,6 +15,7 @@ public class Gui extends JFrame {
     Container container = getContentPane();
     JPanel gridPanel = new JPanel();
     JPanel optionsPanel = new JPanel();
+    ArrayList<Move> allowedMoves;
     int selectedX = 0;
     int selectedY = 0;
     private JPanel borderPanel;
@@ -128,6 +129,21 @@ public class Gui extends JFrame {
             }
         });
 
+        helpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(allowedMoves == null)
+                    allowedMoves = Game.getAllAllowedMoves(game.actualGameState);
+               else
+                    allowedMoves=null;
+
+                refreshTheGui(game.actualGameState);
+
+
+            }
+        });
+
         //Pause button listener.
         pauseButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -145,24 +161,13 @@ public class Gui extends JFrame {
             }
         });
 
-
-//        Register action listeners for the radio buttons.
-        //difEasy.addActionListener();
-        //difMedium.addActionListener();
-        //difHard.addActionListener((ActionListener) difHard);
-
-//        public void actionPerformed(ActionEvent e) {
-//            picture.setIcon(new ImageIcon("images/"
-//                    + e.getActionCommand()
-//                    + ".gif"));}
-
-
         //Adds the buttons and label to the flow panel
         flowPanel.add(labelDif);
         flowPanel.add(difEasy);
         flowPanel.add(difMedium);
         flowPanel.add(difHard);
         flowPanel.add(bRules);
+        flowPanel.add(helpButton);
         flowPanel.add(pauseButton);
         flowPanel.add(labelInfo);
         //Orders the buttons left to right.
@@ -250,13 +255,9 @@ public class Gui extends JFrame {
                     JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
                     break;
                 }
-
             }
         }
-
-        //this.placeToken(x, y);
     }
-
     void refreshTheGui(GameState gameState) {//ArrayList<Token> tokenList
         //Clears the gridPanel.
         int squareCount = this.gridPanel.getComponentCount();
@@ -286,8 +287,19 @@ public class Gui extends JFrame {
                     for (Move move : visMoveList) {
                         Square targetSquare = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
                         targetSquare.greenHighlightSquare(true);
+
                     }
                 }
+
+            }
+        }
+        if (allowedMoves != null) {
+            for (Move move : allowedMoves) {
+                Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
+                targetSquare.greenHighlightSquare(true);
+                targetSquare = null;
+                targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.token.x, move.token.y));
+                targetSquare.highlightSquare(true);
             }
         }
         this.gridPanel.updateUI();

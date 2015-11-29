@@ -45,7 +45,7 @@ public class Square extends JPanel {
             }
             g.fillOval(diff, diff, height, height);
 
-            //check if the token is a king
+            //Checks if the token is a king
             if (occupant.tType == Token.TokenType.King) {
                 height = (int) (squareHeight * 0.45);
                 diff = (squareHeight - height) / 2;
@@ -53,7 +53,7 @@ public class Square extends JPanel {
                 g.fillOval(diff, diff, height, height);
             }
 
-            //check if the square is highlighted
+            //Checks if the square is highlighted
 
             if (isHighlighted) {
                 height = (int) (squareHeight * 0.9);
