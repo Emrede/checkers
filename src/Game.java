@@ -21,6 +21,7 @@ public class Game {
         ArrayList<Move> movelist = getAllAllowedMoves(actualGameState);
         int i = 0;
         int y;
+        int z;
     }
 
     public void refreshGui() {
