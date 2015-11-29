@@ -15,12 +15,14 @@ public class Game {
 
     public Game() {
         restartGame();//create new tokens
-        gameGui.refreshTheGui(actualGameState);
+
+        //gameGui.refreshTheGui(actualGameState);
         refreshGui();
 
-        ArrayList<Move> movelist = getAllAllowedMoves(actualGameState);
+
         int i = 0;
         int y;
+        int k;
     }
 
     public void refreshGui() {
@@ -124,7 +126,7 @@ public class Game {
             int newY = token.y + 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -143,7 +145,7 @@ public class Game {
             int newY = token.y + 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -161,7 +163,7 @@ public class Game {
             int newY = token.y - 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -179,7 +181,7 @@ public class Game {
             int newY = token.y - 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -202,59 +204,6 @@ public class Game {
     //
     //
 
-    /**
-     * Moves the token to the correct place.
-     * This function does not check if the move is a valid one.
-     * This function changes the current player
-     * This function takes multistep moves in to action and sets the gameState accourdingly
-     *
-     * @param gameState
-     * @param move
-     */
-    public static void move(GameState gameState, Move move) {
-        if (move.isAnEatingMove) {//Eat a token and move
-            Token tokenToBeEaten = isThereAnyTokenAtLocation(move.targetX, move.targetY, gameState.tokenList);
-            if (tokenToBeEaten == null) {//If this is true, something went wrong
-                System.out.println("Move failed. Could not find a token at the target location x:" + move.targetX + " , y:" + move.targetY);
-                return;
-            }
-            //calculate the new location
-            int newX, newY;
-            newX = 2 * tokenToBeEaten.x - move.token.x;
-            newY = 2 * tokenToBeEaten.y - move.token.y;
-            //update the token location
-            move.token.x = newX;
-            move.token.y = newY;
-
-            gameState.tokenList.remove(tokenToBeEaten);//remove the eaten token from the list
-
-            //check if this token can eat another token(multistep)
-            ArrayList<Move> tmpMoveList;
-            tmpMoveList = getPossibleMovesForToken(gameState, move.token);
-            if (tmpMoveList == null) {//no more moves possible
-                gameState.multiStepMoveOnGo = false;//multistep finished or not possible
-                gameState.multiStepToken = null;
-            } else {//check if token can eat more tokens at the new location
-                boolean canEatMore = false;
-                for (Move tmpMove : tmpMoveList) {
-                    if (tmpMove.isAnEatingMove) canEatMore = true;
-                }
-                if (canEatMore) {
-                    gameState.multiStepMoveOnGo = true;//
-                    gameState.multiStepToken = move.token;
-                } else {
-                    gameState.multiStepMoveOnGo = false;//
-                    gameState.multiStepToken = null;
-                    gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
-                }
-            }
-        } else {//move the token
-            move.token.x = move.targetX;
-            move.token.y = move.targetY;
-            gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
-        }
-    }
-
     public static Token isThereAnyTokenAtLocation(int newLocX, int newLocY, ArrayList<Token> tokenList) {
 
 
@@ -267,7 +216,7 @@ public class Game {
     }
 
     //check if currentT can eat the eatenT
-    static boolean canEatToken(Token currentT, Token eatenT) {
+    static boolean canEatToken(Token currentT, Token eatenT,ArrayList<Token> tokenList) {
         //check if tokens are adjacent
         if ((Math.abs(currentT.x - eatenT.x) != 1) || (Math.abs(currentT.y - eatenT.y) != 1)) {
             return false;
@@ -285,6 +234,11 @@ public class Game {
         newY = 2 * eatenT.y - currentT.y;
         //check if location is out of board
         if (newY < 1 || newX < 1 || newX > 8 || newY > 8) {
+            return false;
+        }
+        //check if location is empty
+        Token tmpToken = isThereAnyTokenAtLocation(newX,newY,tokenList);
+        if(tmpToken !=null){
             return false;
         }
 
