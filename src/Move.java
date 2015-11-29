@@ -4,7 +4,7 @@ import java.util.ArrayList;
  * Created by Emre on 11/27/2015.
  */
 public class Move {
-    public Token token;
+    public Token token;//Current token
     public int targetX;
     public int targetY;
     public boolean isAnEatingMove;
@@ -20,8 +20,7 @@ public class Move {
      * Moves the token to the correct place.
      * This function does not check if the move is a valid one.
      * This function changes the current player
-     * This function changes tokens to king if in right place
-     * This function takes multistep moves in to action and sets the gameState accordingly
+     * This function takes multistep moves into action and sets the gameState accordingly
      *
      * @param gameState
      * @param movement

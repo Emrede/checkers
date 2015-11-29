@@ -12,6 +12,7 @@ public class GameState {
     public Token selectedToken;
     public ArrayList<Token> tokenList = new ArrayList<Token>();
     public boolean multiStepMoveOnGo;
+    public boolean isAnyTokenSelected = false;
     public Token multiStepToken;
     
     public GameState(ArrayList<Token> tokenList, Token.TokenPlayer currentPlayer){
@@ -59,7 +60,7 @@ public class GameState {
     }
 
     public static GameResult getResult(GameState gameState){
-        //check tokens
+        //Check tokens
         boolean p1TokenFound = false;
         boolean p2TokenFound = false;
 
@@ -67,20 +68,20 @@ public class GameState {
             if(token.player == Token.TokenPlayer.P1) p1TokenFound = true;
             else p2TokenFound = true;
         }
-        //if a player does not have anymore tokens other pllayer wins
+        //If a player does not have anymore tokens other pllayer wins
         if(!p1TokenFound) return GameResult.P2Wins;
         if(!p2TokenFound) return GameResult.P1Wins;
 
-        //check possible moves to see if the current player can move
+        //Check possible moves to see if the current player can move
         ArrayList<Move> tmpMoveList = Game.getAllAllowedMoves(gameState);
         if(tmpMoveList == null){
-            //no possible moves! current player can not move so opposing player wins
+            //No possible moves! current player can not move so opposing player wins
             if(gameState.currentPlayer == Token.TokenPlayer.P1) return GameResult.P2Wins;
             else return  GameResult.P1Wins;
         }
 
-        //draw conditions are not checked.
-        //currently draw not possible
+        //Draw conditions are not checked.
+        //Currently draw not possible
         return GameResult.Continuue;
 
     }
