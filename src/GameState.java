@@ -14,7 +14,6 @@ public class GameState {
     public boolean multiStepMoveOnGo;
     public boolean isAnyTokenSelected = false;
     public Token multiStepToken;
-
     
     public GameState(ArrayList<Token> tokenList, Token.TokenPlayer currentPlayer){
         this.currentPlayer = currentPlayer;
@@ -22,6 +21,18 @@ public class GameState {
             this.tokenList.add(token);
         }
 
+    }
+    public GameState(GameState gameState){
+        this.currentPlayer = Token.TokenPlayer.values()[gameState.currentPlayer.ordinal()];
+        this.selectedToken = new Token(gameState.selectedToken);
+        if(gameState.tokenList != null){
+            for(Token token:gameState.tokenList){
+                Token tmpToken = new Token(token);
+                tokenList.add(tmpToken);
+            }
+        }
+        this.multiStepMoveOnGo = gameState.multiStepMoveOnGo;
+        this.multiStepToken = new Token(gameState.multiStepToken);
     }
 
 
