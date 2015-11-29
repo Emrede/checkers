@@ -19,6 +19,13 @@ public class Token {
         this.player = TokenPlayer.P1;
     }
 
+    public Token(Token token){
+        this.x = token.x;
+        this.y = token.y;
+        this.player = TokenPlayer.values()[token.player.ordinal()];
+        this.tType = TokenType.values()[token.tType.ordinal()];
+    }
+
     public Token(int x, int y, TokenPlayer player, TokenType tType) {
         this.x = x;
         this.y = y;
