@@ -25,7 +25,7 @@ public class Minimax {
         }
         ArrayList<Move> children = Game.getAllAllowedMoves(minimaxGameState);
 
-        if (minimaxGameState.currentPlayer == Token.TokenPlayer.P1) {
+        if (minimaxGameState.currentPlayer == Token.TokenPlayer.P1) {//Max's turn
             for (Move move : children) {
                 GameState tmpGameState = new GameState(minimaxGameState);
                 Move.move(tmpGameState, move);
@@ -38,7 +38,7 @@ public class Minimax {
             }
             return score;
 
-        } else {
+        } else {//Min's turn
             for (Move move : children) {
                 GameState tmpGameState = new GameState(minimaxGameState);
                 Move.move(tmpGameState, move);

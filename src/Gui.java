@@ -316,7 +316,7 @@ public class Gui extends JFrame {
                                 if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
                                 else infoText = "P2 wins.";
                             }
-                        }while(game.actualGameState.currentPlayer != currentPlayer);
+                        }while(game.actualGameState.currentPlayer != currentPlayer);//Move until current player changes. In case of multistep move
                     }
                 }
                 if (!foundCorrectMove && !newTokenSelected) {
