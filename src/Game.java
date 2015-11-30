@@ -6,11 +6,10 @@ import java.util.ArrayList;
 
 public class Game {
 
-    GameState actualGameState;
-    Gui gameGui = new Gui(this);
-
     //Difficulty Level Changer: Easy:1  Medium: 2 Hard: 3
     public int difficultyLevel = 2;//Default: Medium
+    GameState actualGameState;
+    Gui gameGui = new Gui(this);
     boolean isGamePaused = false;
 
     public Game() {
@@ -25,21 +24,10 @@ public class Game {
         int k;
     }
 
-    public void refreshGui() {
-        gameGui.refreshTheGui(actualGameState);
-    }
-
-    void restartGame() {
-        ArrayList<Token> tokenList;
-        tokenList = Token.createTokens();
-        actualGameState = new GameState(tokenList, Token.TokenPlayer.P1);//by default P1 is the first player
-    }
-
-
     public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
         ArrayList<Move> nonEatingMoveList = new ArrayList<>();
         ArrayList<Move> eatingMoveList = new ArrayList<>();
-        if(gameState.multiStepMoveOnGo) {//check if multistep move in progress
+        if (gameState.multiStepMoveOnGo) {//check if multistep move in progress
             ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, gameState.multiStepToken);//get possible moves for a token
             if (tmpMoveList != null) {//check if the move list is empty
                 for (Move move : tmpMoveList) {
@@ -48,11 +36,10 @@ public class Game {
                     }
                 }
             }
-            if(eatingMoveList.isEmpty()){//a mutistep move can only eat.
+            if (eatingMoveList.isEmpty()) {//a mutistep move can only eat.
                 return null;//if no eating moves are possible return null
             }
-        }
-        else{//no multistep move in progress
+        } else {//no multistep move in progress
             for (Token token : gameState.tokenList) {//get possible moves for each token on the board
                 if (token.player == gameState.currentPlayer) {//check if the token is from the current player
                     ArrayList<Move> tmpMoveList = getPossibleMovesForToken(gameState, token);//get possible moves for a token
@@ -80,7 +67,6 @@ public class Game {
             }
         }
     }
-
 
     //Returns possible moves for a token
     //If no moves are possible return null
@@ -126,7 +112,7 @@ public class Game {
             int newY = token.y + 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken, gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -145,7 +131,7 @@ public class Game {
             int newY = token.y + 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken, gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -163,7 +149,7 @@ public class Game {
             int newY = token.y - 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken, gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -181,7 +167,7 @@ public class Game {
             int newY = token.y - 1;
             tmpToken = isThereAnyTokenAtLocation(newX, newY, gameState.tokenList);
             if (tmpToken != null) {//there is a token at the target location
-                if (canEatToken(token, tmpToken,gameState.tokenList)) {//check if token can be eaten
+                if (canEatToken(token, tmpToken, gameState.tokenList)) {//check if token can be eaten
                     tmpMove = new Move(token, newX, newY, true);
                 }
             } else {//target location is empty
@@ -200,10 +186,6 @@ public class Game {
         }
     }
 
-
-    //
-    //
-
     public static Token isThereAnyTokenAtLocation(int newLocX, int newLocY, ArrayList<Token> tokenList) {
 
 
@@ -216,7 +198,7 @@ public class Game {
     }
 
     //check if currentT can eat the eatenT
-    static boolean canEatToken(Token currentT, Token eatenT,ArrayList<Token> tokenList) {
+    static boolean canEatToken(Token currentT, Token eatenT, ArrayList<Token> tokenList) {
         //check if tokens are adjacent
         if ((Math.abs(currentT.x - eatenT.x) != 1) || (Math.abs(currentT.y - eatenT.y) != 1)) {
             return false;
@@ -227,8 +209,8 @@ public class Game {
             return false;
         }
 
-        //calculate the new position
-        //newLoc = 2*eatenT.pos - currentT.pos
+        //Calculate the new position
+        //NewLoc = 2*eatenT.pos - currentT.pos
         int newX, newY;
         newX = 2 * eatenT.x - currentT.x;
         newY = 2 * eatenT.y - currentT.y;
@@ -236,13 +218,21 @@ public class Game {
         if (newY < 1 || newX < 1 || newX > 8 || newY > 8) {
             return false;
         }
-        //check if location is empty
-        Token tmpToken = isThereAnyTokenAtLocation(newX,newY,tokenList);
-        if(tmpToken !=null){
+        //Check if location is empty
+        Token tmpToken = isThereAnyTokenAtLocation(newX, newY, tokenList);
+        if (tmpToken != null) {
             return false;
         }
-
         return true;
+    }
 
+    public void refreshGui() {
+        gameGui.refreshTheGui(actualGameState);
+    }
+
+    void restartGame() {
+        ArrayList<Token> tokenList;
+        tokenList = Token.createTokens();
+        actualGameState = new GameState(tokenList, Token.TokenPlayer.P1);//by default P1 is the first player
     }
 }

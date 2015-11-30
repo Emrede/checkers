@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 //A game instance
 public class GameState {
-    public enum GameResult{P1Wins, P2Wins, Draw, Continuue};
+    public enum GameResult{P1Wins, P2Wins, Draw, Continue};
 
     public Token.TokenPlayer currentPlayer;
     public Token selectedToken;
@@ -82,7 +82,7 @@ public class GameState {
 
         //Draw conditions are not checked.
         //Currently draw not possible
-        return GameResult.Continuue;
+        return GameResult.Continue;
 
     }
 

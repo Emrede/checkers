@@ -13,7 +13,8 @@ public class Minimax {
         this.move = move;
     }
 
-    public Minimax minimax(int depth, GameState minimaxGameState, int alpha, int beta) {
+
+    public static Minimax minimax(int depth, GameState minimaxGameState, int alpha, int beta) {
         //int score;
         Minimax score = new Minimax(0, null);
         GameState.GameResult gameResult = GameState.getResult(minimaxGameState);
