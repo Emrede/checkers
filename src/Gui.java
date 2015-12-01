@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -26,6 +25,7 @@ public class Gui extends JFrame {
     int targetX, targetY;
     Component frame;
     boolean helpClicked = false;
+    final int SleepDuration = 1500;//[ms]
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -107,7 +107,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 1;
+                    game.difficultyLevel = 5;
                 }
             }
         });
@@ -117,7 +117,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 2;
+                    game.difficultyLevel = 10;
                 }
             }
         });
@@ -127,7 +127,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 3;
+                    game.difficultyLevel = 15;
                 }
             }
         });
@@ -238,6 +238,40 @@ public class Gui extends JFrame {
         return squareIndex;
     }
 
+
+    Timer timer = new Timer(SleepDuration, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
+
+//                try {
+//                    Thread.sleep(SleepDuration);
+//                } catch (InterruptedException ex) {
+//                    ex.printStackTrace();
+//                }
+                ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
+                Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                System.out.println("Minimax score: "+minimax.score);
+                if (minimax.move != null) {
+                    game.actualGameState.selectedToken = minimax.move.token;
+                    Move.move(game.actualGameState, minimax.move);
+                    refreshTheGui(game.actualGameState);
+                }
+
+                GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
+                if (gameResult != GameState.GameResult.Continue) {
+                    if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
+                    else infoText = "P2 wins.";
+                    refreshTheGui(game.actualGameState);
+                    return;
+                }
+
+            if (game.actualGameState.currentPlayer == currentPlayer){//Move until current player changes. In case of multistep move
+                timer.setRepeats(false); // Only execute once
+                timer.start(); // Go go go!
+            }
+        }
+    });
     /**
      * @param panel
      */
@@ -260,15 +294,15 @@ public class Gui extends JFrame {
         if (tmpMoves != null) {
             for (Move move : tmpMoves) {
                 //if (move.isAnEatingMove == false) { //If is there any compulsory movement, can't select the token. If not select it.
-                    Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
-                    if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
-                        game.actualGameState.selectedToken = anyToken; //Select it.
-                        game.actualGameState.isAnyTokenSelected = true;
-                        targetX=0;
-                        targetY=0;
-                        newTokenSelected = true;
-                        infoText = "";
-                    }
+                Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
+                if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
+                    game.actualGameState.selectedToken = anyToken; //Select it.
+                    game.actualGameState.isAnyTokenSelected = true;
+                    targetX = 0;
+                    targetY = 0;
+                    newTokenSelected = true;
+                    infoText = "";
+                }
 //                    else {
 //                        JOptionPane.showMessageDialog(frame, "You have a compulsory move, can't move this piece.");
 //                        break;
@@ -282,35 +316,56 @@ public class Gui extends JFrame {
         if (game.actualGameState.isAnyTokenSelected) {
             targetX = x;
             targetY = y;
-           // Move tmpMove=null;
+            // Move tmpMove=null;
             if (tmpMoves != null) {
                 boolean foundCorrectMove = false;
                 for (Move move : tmpMoves) {
                     if (move.targetX == targetX
                             && move.targetY == targetY
-                            && move.token ==game.actualGameState.selectedToken) {
-                        System.out.format("Move. tx=%d  ty=%d to x=%d y=%d", game.actualGameState.selectedToken.x, game.actualGameState.selectedToken.y, targetX , targetY );
+                            && move.token == game.actualGameState.selectedToken) {
+                        System.out.format("Move. tx=%d  ty=%d to x=%d y=%d", game.actualGameState.selectedToken.x, game.actualGameState.selectedToken.y, targetX, targetY);
+                        Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
                         Move.move(game.actualGameState, move);
                         infoText = "";
                         foundCorrectMove = true;
                         game.actualGameState.isAnyTokenSelected = false;
                         game.actualGameState.selectedToken = null;
+                        refreshTheGui(game.actualGameState);
 
-                        GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
-                        if(gameResult != GameState.GameResult.Continuue){
-                            if(gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
-                            else infoText = "P2 wins.";
+                        if(currentPlayer != game.actualGameState.currentPlayer) {//check if current player is changed
+                            timer.setRepeats(false); // Only execute once
+                            timer.start(); // Go go go!
                         }
+//                        Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
+//                        do {
+//                            try {
+//                                Thread.sleep(SleepDuration);
+//                            } catch (InterruptedException ex) {
+//                                ex.printStackTrace();
+//                            }
+//                            ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
+//                            Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
+//                            if (minimax.move != null) {
+//                                game.actualGameState.selectedToken = minimax.move.token;
+//                                Move.move(game.actualGameState,minimax.move);
+//                                refreshTheGui(game.actualGameState);
+//                            }
+//
+//                            GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
+//                            if (gameResult != GameState.GameResult.Continue) {
+//                                if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
+//                                else infoText = "P2 wins.";
+//                            }
+//                        }while(game.actualGameState.currentPlayer == currentPlayer);//Move until current player changes. In case of multistep move
                     }
                 }
-                if(!foundCorrectMove && !newTokenSelected){
+
+                if (!foundCorrectMove && !newTokenSelected) {
                     infoText = "Cannot move there!";
-                    System.out.println("can not move there");
+                    System.out.println("Cannot move there");
                 }
             }
-//            if (tmpMove != null) {
-//
-//            }
+
         }
         refreshTheGui(game.actualGameState);
     }
@@ -351,9 +406,9 @@ public class Gui extends JFrame {
             //}
         }
 
-        if(helpClicked){//show all available moves
-            if(allowedMoves != null){
-                for(Move move : allowedMoves){
+        if (helpClicked) {//show all available moves
+            if (allowedMoves != null) {
+                for (Move move : allowedMoves) {
                     Square targetSquare = (Square) gridPanel.getComponent(getGridIndexFromCoordinates(move.targetX, move.targetY));
                     targetSquare.greenHighlightSquare(true);
                     //targetSquare = null;
@@ -362,8 +417,7 @@ public class Gui extends JFrame {
                 }
             }
             helpClicked = false;//show moves only once
-        }
-        else {//show only selected tokens moves
+        } else {//show only selected tokens moves
             ArrayList<Move> visMoveList = Game.getAllAllowedMoves(gameState);
             if (visMoveList != null) {
                 for (Move move : visMoveList) {
@@ -379,12 +433,10 @@ public class Gui extends JFrame {
         }
 
 
-
-        if(game.actualGameState.currentPlayer== Token.TokenPlayer.P1) {
-            labelInfo.setText("Black moves "+infoText );
-        }
-        else{
-            labelInfo.setText("Red moves "+infoText );
+        if (game.actualGameState.currentPlayer == Token.TokenPlayer.P1) {
+            labelInfo.setText("Black moves " + infoText);
+        } else {
+            labelInfo.setText("Red moves " + infoText);
         }
 
 

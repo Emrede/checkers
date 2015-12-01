@@ -15,6 +15,14 @@ public class Move {
         this.targetY = targetY;
         this.isAnEatingMove = isAnEatingMove;
     }
+    public Move(Move move){
+        Token token = new Token(move.token);
+        this.token = token;
+        this.targetX = move.targetX;
+        this.targetY = move.targetY;
+        this.isAnEatingMove = move.isAnEatingMove;
+
+    }
 
     /**
      * Moves the token to the correct place.
@@ -32,11 +40,11 @@ public class Move {
                 System.out.println("Move failed. Could not find a token at the target location x:" + movement.targetX + " , y:" + movement.targetY);
                 return;
             }
-            //calculate the new location
+            //Calculate the new location
             int newX, newY;
             newX = 2 * tokenToBeEaten.x - movement.token.x;
             newY = 2 * tokenToBeEaten.y - movement.token.y;
-            //update the token location
+            //Update the token location
             movement.token.x = newX;
             movement.token.y = newY;
             if(newY == 8 || newY ==1){//Check if token becomes a king
@@ -44,14 +52,14 @@ public class Move {
             }
             gameState.tokenList.remove(tokenToBeEaten);//remove the eaten token from the list
 
-            //check if this token can eat another token(multistep)
+            //Check if this token can eat another token(multistep)
             ArrayList<Move> tmpMoveList;
             tmpMoveList = Game.getPossibleMovesForToken(gameState, movement.token);
             if (tmpMoveList == null) {//no more moves possible
                 gameState.multiStepMoveOnGo = false;//multistep finished or not possible
                 gameState.multiStepToken = null;
                 gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
-            } else {//check if token can eat more tokens at the new location
+            } else {//Check if token can eat more tokens at the new location
                 boolean canEatMore = false;
                 for (Move tmpMove : tmpMoveList) {
                     if (tmpMove.isAnEatingMove) canEatMore = true;
@@ -65,7 +73,7 @@ public class Move {
                     gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
                 }
             }
-        } else {//move the token
+        } else {//Move the token
             movement.token.x = movement.targetX;
             movement.token.y = movement.targetY;
             if(movement.token.y == 8 || movement.token.y ==1){//Check if token becomes a king
@@ -73,6 +81,22 @@ public class Move {
             }
             gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
         }
+    }
+
+    //finds a move in a list. Move is in a different instance of game state.
+    public static Move matchMoveBetweenStates(ArrayList<Move> moveList,  Move moveToBeFound){
+        for(Move move:moveList){
+            if(move.targetX == moveToBeFound.targetX){
+                if(move.targetY == moveToBeFound.targetY){
+                    if(move.token.x == moveToBeFound.token.x){
+                        if(move.token.y== moveToBeFound.token.y){
+                            return move;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

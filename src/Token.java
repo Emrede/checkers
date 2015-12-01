@@ -17,9 +17,11 @@ public class Token {
         this.x = 0;
         this.y = 0;
         this.player = TokenPlayer.P1;
+        this.tType =TokenType.Pawn;
     }
 
     public Token(Token token){
+
         this.x = token.x;
         this.y = token.y;
         this.player = TokenPlayer.values()[token.player.ordinal()];
