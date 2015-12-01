@@ -42,20 +42,21 @@ public class GameState {
     public static int getScore(GameState gamestate) {
         int score = 0;
         for (Token token : gamestate.tokenList) {
-            if (token.player == Token.TokenPlayer.P1) {//P1 tokens increase the score
+            if (token.player == Token.TokenPlayer.P2) {//P2 tokens increase the score
                 if (token.tType == Token.TokenType.Pawn) {
-                    score += 2;//kings count as 2
+                    score += 5;//kings count as 2
                 } else {
-                    score++;//
+                    score++;//pawn counts as 1
                 }
             } else {//P2 tokens decrease the score
                 if (token.tType == Token.TokenType.Pawn) {
-                    score -= 2;//kings count as 2
+                    score -= 5;//kings count as 2
                 } else {
                     score--;//
                 }
             }
         }
+        System.out.println(score);
         return score;
     }
 

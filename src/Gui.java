@@ -25,7 +25,7 @@ public class Gui extends JFrame {
     int targetX, targetY;
     Component frame;
     boolean helpClicked = false;
-    final int SleepDuration = 500;//[ms]
+    final int SleepDuration = 1500;//[ms]
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -127,7 +127,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 20;
+                    game.difficultyLevel = 15;
                 }
             }
         });
@@ -238,6 +238,40 @@ public class Gui extends JFrame {
         return squareIndex;
     }
 
+
+    Timer timer = new Timer(SleepDuration, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
+
+//                try {
+//                    Thread.sleep(SleepDuration);
+//                } catch (InterruptedException ex) {
+//                    ex.printStackTrace();
+//                }
+                ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
+                Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                System.out.println("Minimax score: "+minimax.score);
+                if (minimax.move != null) {
+                    game.actualGameState.selectedToken = minimax.move.token;
+                    Move.move(game.actualGameState, minimax.move);
+                    refreshTheGui(game.actualGameState);
+                }
+
+                GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
+                if (gameResult != GameState.GameResult.Continue) {
+                    if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
+                    else infoText = "P2 wins.";
+                    refreshTheGui(game.actualGameState);
+                    return;
+                }
+
+            if (game.actualGameState.currentPlayer == currentPlayer){//Move until current player changes. In case of multistep move
+                timer.setRepeats(false); // Only execute once
+                timer.start(); // Go go go!
+            }
+        }
+    });
     /**
      * @param panel
      */
@@ -290,6 +324,7 @@ public class Gui extends JFrame {
                             && move.targetY == targetY
                             && move.token == game.actualGameState.selectedToken) {
                         System.out.format("Move. tx=%d  ty=%d to x=%d y=%d", game.actualGameState.selectedToken.x, game.actualGameState.selectedToken.y, targetX, targetY);
+                        Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
                         Move.move(game.actualGameState, move);
                         infoText = "";
                         foundCorrectMove = true;
@@ -297,28 +332,34 @@ public class Gui extends JFrame {
                         game.actualGameState.selectedToken = null;
                         refreshTheGui(game.actualGameState);
 
-                        Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
-                        do {
-                            try {
-                                Thread.sleep(SleepDuration);
-                            } catch (InterruptedException ex) {
-                                ex.printStackTrace();
-                            }
-                            Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MAX_VALUE, Integer.MIN_VALUE);
-                            if (minimax.move != null) {
-                                game.actualGameState.selectedToken = minimax.move.token;
-                                Move.move(game.actualGameState,minimax.move);
-                                refreshTheGui(game.actualGameState);
-                            }
-
-                            GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
-                            if (gameResult != GameState.GameResult.Continue) {
-                                if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
-                                else infoText = "P2 wins.";
-                            }
-                        }while(game.actualGameState.currentPlayer != currentPlayer);//Move until current player changes. In case of multistep move
+                        if(currentPlayer != game.actualGameState.currentPlayer) {//check if current player is changed
+                            timer.setRepeats(false); // Only execute once
+                            timer.start(); // Go go go!
+                        }
+//                        Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
+//                        do {
+//                            try {
+//                                Thread.sleep(SleepDuration);
+//                            } catch (InterruptedException ex) {
+//                                ex.printStackTrace();
+//                            }
+//                            ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
+//                            Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
+//                            if (minimax.move != null) {
+//                                game.actualGameState.selectedToken = minimax.move.token;
+//                                Move.move(game.actualGameState,minimax.move);
+//                                refreshTheGui(game.actualGameState);
+//                            }
+//
+//                            GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
+//                            if (gameResult != GameState.GameResult.Continue) {
+//                                if (gameResult == GameState.GameResult.P1Wins) infoText = "P1 wins. Congrats";
+//                                else infoText = "P2 wins.";
+//                            }
+//                        }while(game.actualGameState.currentPlayer == currentPlayer);//Move until current player changes. In case of multistep move
                     }
                 }
+
                 if (!foundCorrectMove && !newTokenSelected) {
                     infoText = "Cannot move there!";
                     System.out.println("Cannot move there");

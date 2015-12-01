@@ -15,6 +15,14 @@ public class Move {
         this.targetY = targetY;
         this.isAnEatingMove = isAnEatingMove;
     }
+    public Move(Move move){
+        Token token = new Token(move.token);
+        this.token = token;
+        this.targetX = move.targetX;
+        this.targetY = move.targetY;
+        this.isAnEatingMove = move.isAnEatingMove;
+
+    }
 
     /**
      * Moves the token to the correct place.
@@ -73,6 +81,22 @@ public class Move {
             }
             gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
         }
+    }
+
+    //finds a move in a list. Move is in a different instance of game state.
+    public static Move matchMoveBetweenStates(ArrayList<Move> moveList,  Move moveToBeFound){
+        for(Move move:moveList){
+            if(move.targetX == moveToBeFound.targetX){
+                if(move.targetY == moveToBeFound.targetY){
+                    if(move.token.x == moveToBeFound.token.x){
+                        if(move.token.y== moveToBeFound.token.y){
+                            return move;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class Game {
 
-    //Difficulty Level Changer: Easy:1  Medium: 2 Hard: 3
-    public int difficultyLevel = 2;//Default: Medium
+    //Difficulty Level Changer: Easy:5  Medium: 10 Hard: 15; depth for minimax
+    public int difficultyLevel = 10;//Default: Medium
     GameState actualGameState;
     Gui gameGui = new Gui(this);
     boolean isGamePaused = false;
@@ -18,10 +18,6 @@ public class Game {
         //gameGui.refreshTheGui(actualGameState);
         refreshGui();
 
-
-        int i = 0;
-        int y;
-        int k;
     }
 
     public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
