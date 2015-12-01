@@ -16,7 +16,7 @@ public class Game {
         restartGame();//create new tokens
 
         //gameGui.refreshTheGui(actualGameState);
-        refreshGui();
+        gameGui.refreshTheGui(actualGameState);
 
 
         int i = 0;
@@ -226,9 +226,6 @@ public class Game {
         return true;
     }
 
-    public void refreshGui() {
-        gameGui.refreshTheGui(actualGameState);
-    }
 
     void restartGame() {
         ArrayList<Token> tokenList;
