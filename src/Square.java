@@ -55,12 +55,19 @@ public class Square extends JPanel {
 
             //Checks if the square is highlighted
 
-            if (isHighlighted) {
+            if (isGreenHighlighted) {
+                height = (int) (squareHeight * 0.9);
+                diff = (squareHeight - height) / 2;
+                g.setColor(Color.green);
+                g.drawRect(diff, diff, height, height);
+            }
+            else if(isHighlighted){
                 height = (int) (squareHeight * 0.9);
                 diff = (squareHeight - height) / 2;
                 g.setColor(Color.orange);
                 g.drawRect(diff, diff, height, height);
             }
+
         } else {
 
             if (isGreenHighlighted) {

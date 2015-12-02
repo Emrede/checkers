@@ -43,19 +43,23 @@ public class GameState {
         int score = 0;
         for (Token token : gamestate.tokenList) {
             if (token.player == Token.TokenPlayer.P2) {//P2 tokens increase the score
-                if (token.tType == Token.TokenType.Pawn) {
-                    score += 5;//kings count as 2
+                if (token.tType == Token.TokenType.King) {
+                    score += 3;//Kings count as 3
                 } else {
-                    score++;//pawn counts as 1
+                    score++;//Pawns counts as 1
                 }
             } else {//P2 tokens decrease the score
-                if (token.tType == Token.TokenType.Pawn) {
-                    score -= 5;//kings count as 2
+                if (token.tType == Token.TokenType.King) {
+                    score -= 3;//Kings count as 3
                 } else {
-                    score--;//
+                    score--;//Pawns counts as 1
                 }
             }
         }
+
+        GameResult gameResult = getResult(gamestate);
+        if(gameResult == GameResult.P1Wins) score -= 50;//Winning the game counts as 50
+        if(gameResult == GameResult.P2Wins) score += 50;
         System.out.println(score);
         return score;
     }

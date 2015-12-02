@@ -225,6 +225,7 @@ public class Game {
 
     void restartGame() {
         ArrayList<Token> tokenList;
+//        tokenList = Token.createTestingTokens();
         tokenList = Token.createTokens();
         actualGameState = new GameState(tokenList, Token.TokenPlayer.P1);//by default P1 is the first player
     }
