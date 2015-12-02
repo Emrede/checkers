@@ -48,11 +48,12 @@ public class Minimax {
                 if(beta <= alpha) break;
 
             }
-
+            System.out.println("Alpha: "+alpha+" Beta: "+ beta + " Score: "+score.score);
+            return score;
 
         } else {//Min's turn
             score.score=Integer.MAX_VALUE;
-            for (Move move : successorEvaluations) {
+            for (Move move : children) {
                 //Move moveBckUp = new Move(move);
                 GameState minimaxGameState = new GameState(actualGameState);
                 ArrayList<Move> tmpMovesList = Game.getAllAllowedMoves(minimaxGameState);
@@ -70,7 +71,8 @@ public class Minimax {
 
 
             }
-
+            System.out.println("Alpha: "+alpha+" Beta: "+ beta + " Score: "+score.score);
+            return score;
         }
 
 //        //Find the move in the actual game state and return it
@@ -81,8 +83,10 @@ public class Minimax {
 //
 //        }
 //        score.move = actualMove;
-        System.out.println("Alpha: "+alpha+" Beta: "+ beta + " Score: "+score.score);
-        return score;
+
+
+//        System.out.println("Alpha: "+alpha+" Beta: "+ beta + " Score: "+score.score);
+//        return score;
 
     }
 

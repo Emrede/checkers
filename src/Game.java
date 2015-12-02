@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Game {
 
-    //Difficulty Level Changer: Easy:5  Medium: 10 Hard: 15; depth for minimax
+    //Difficulty Level Changer: Easy:3  Medium: 6 Hard: 15; depth for minimax
     public int difficultyLevel = 10;//Default: Medium
     GameState actualGameState;
     Gui gameGui = new Gui(this);
@@ -225,6 +225,7 @@ public class Game {
 
     void restartGame() {
         ArrayList<Token> tokenList;
+//        tokenList = Token.createTestingTokens();
         tokenList = Token.createTokens();
         actualGameState = new GameState(tokenList, Token.TokenPlayer.P1);//by default P1 is the first player
     }

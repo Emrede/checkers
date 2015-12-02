@@ -113,7 +113,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 8; // Medium depth.
+                    game.difficultyLevel = 6; // Medium depth.
                 }
             }
         });
@@ -122,7 +122,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 15; //Hard depth.
+                    game.difficultyLevel = 10; //Hard depth.
                 }
             }
         });
@@ -135,6 +135,7 @@ public class Gui extends JFrame {
                 else
                     allowedMoves = null;
                 helpClicked = true;
+                game.actualGameState.selectedToken=null;
                 refreshTheGui(game.actualGameState);
             }
         });
@@ -246,6 +247,16 @@ public class Gui extends JFrame {
                 refreshTheGui(game.actualGameState);
             }
 
+                ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
+                Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                System.out.println("Minimax score: "+minimax.score);
+                if (minimax.move != null) {
+                    game.actualGameState.selectedToken = minimax.move.token;
+                    Move.move(game.actualGameState, minimax.move);
+                    //game.actualGameState.selectedToken=null;
+                    refreshTheGui(game.actualGameState);
+                }
+
             GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
             if (gameResult != GameState.GameResult.Continue) {
                 if (gameResult == GameState.GameResult.P1Wins) {
@@ -287,7 +298,6 @@ public class Gui extends JFrame {
         //Checks all allowed moves and puts them into tmpMoves list.
         tmpMoves = game.getAllAllowedMoves(game.actualGameState);
         if (tmpMoves != null) {
-            //if (move.isAnEatingMove == false) {//If is there any force movement, can't select the token. If not select it.
             Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
             if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
                 game.actualGameState.selectedToken = anyToken; //Select it.
