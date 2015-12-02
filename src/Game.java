@@ -19,7 +19,7 @@ public class Game {
         gameGui.refreshTheGui(actualGameState);
 
     }
-
+    // Successor function for generating AI and validating user moves.5-6
     public static ArrayList<Move> getAllAllowedMoves(GameState gameState) {
         ArrayList<Move> nonEatingMoveList = new ArrayList<>();
         ArrayList<Move> eatingMoveList = new ArrayList<>();
