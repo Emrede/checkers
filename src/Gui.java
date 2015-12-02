@@ -107,7 +107,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 4;
+                    game.difficultyLevel = 3;
                 }
             }
         });
