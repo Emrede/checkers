@@ -32,7 +32,7 @@ public class Token {
         this.x = x;
         this.y = y;
         this.player = player;
-        this.tType = TokenType.Pawn;
+        this.tType = tType;
     }
 
 
@@ -64,6 +64,21 @@ public class Token {
         return newToken;
     }
 
+    public static ArrayList<Token> createTestingTokens() {
+        ArrayList<Token> newTokens = new ArrayList<Token>();
+        //p1 tokens
+        newTokens.add(new Token(2,2,TokenPlayer.P1,TokenType.King));
+
+        //p2 tokens
+        newTokens.add(new Token(2,8,TokenPlayer.P2,TokenType.Pawn));
+//        newTokens.add(new Token(2,6,TokenPlayer.P2,TokenType.Pawn));
+//        newTokens.add(new Token(1,7,TokenPlayer.P2,TokenType.Pawn));
+        newTokens.add(new Token(2,4,TokenPlayer.P2,TokenType.Pawn));
+
+
+
+        return newTokens;
+    }
 
     //returns the opposing player
     public static TokenPlayer getOpposingPlayer(TokenPlayer p){

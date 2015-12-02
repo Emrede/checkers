@@ -107,7 +107,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 5;
+                    game.difficultyLevel = 3;
                 }
             }
         });
@@ -117,7 +117,7 @@ public class Gui extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() > 0) {
-                    game.difficultyLevel = 10;
+                    game.difficultyLevel = 6;
                 }
             }
         });
@@ -141,6 +141,7 @@ public class Gui extends JFrame {
                 else
                     allowedMoves = null;
                 helpClicked = true;
+                //game.actualGameState.selectedToken=null;
                 refreshTheGui(game.actualGameState);
 
 
@@ -255,6 +256,7 @@ public class Gui extends JFrame {
                 if (minimax.move != null) {
                     game.actualGameState.selectedToken = minimax.move.token;
                     Move.move(game.actualGameState, minimax.move);
+                    //game.actualGameState.selectedToken=null;
                     refreshTheGui(game.actualGameState);
                 }
 
