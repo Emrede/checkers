@@ -7,7 +7,7 @@ import java.util.ArrayList;
 public class Game {
 
     //Difficulty Level Changer: Easy:3  Medium: 6 Hard: 15; depth for minimax
-    public int difficultyLevel = 10;//Default: Medium
+    public int difficultyLevel = 6;//Default: Medium
     GameState actualGameState;
     Gui gameGui = new Gui(this);
     boolean isGamePaused = false;

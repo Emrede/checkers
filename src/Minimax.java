@@ -53,7 +53,7 @@ public class Minimax {
 
         } else {//Min's turn
             score.score=Integer.MAX_VALUE;
-            for (Move move : children) {
+            for (Move move : successorEvaluations) {
                 //Move moveBckUp = new Move(move);
                 GameState minimaxGameState = new GameState(actualGameState);
                 ArrayList<Move> tmpMovesList = Game.getAllAllowedMoves(minimaxGameState);

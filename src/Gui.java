@@ -236,26 +236,14 @@ public class Gui extends JFrame {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
-
-
-            ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
             Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
             System.out.println("Minimax score: " + minimax.score);
             if (minimax.move != null) {
                 game.actualGameState.selectedToken = minimax.move.token;
                 Move.move(game.actualGameState, minimax.move);
+                //game.actualGameState.selectedToken=null;
                 refreshTheGui(game.actualGameState);
             }
-
-                ArrayList<Move> dbgMoveList = Game.getAllAllowedMoves(game.actualGameState);
-                Minimax minimax = Minimax.minimax(game.difficultyLevel, game.actualGameState, Integer.MIN_VALUE, Integer.MAX_VALUE);
-                System.out.println("Minimax score: "+minimax.score);
-                if (minimax.move != null) {
-                    game.actualGameState.selectedToken = minimax.move.token;
-                    Move.move(game.actualGameState, minimax.move);
-                    //game.actualGameState.selectedToken=null;
-                    refreshTheGui(game.actualGameState);
-                }
 
             GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
             if (gameResult != GameState.GameResult.Continue) {
@@ -329,7 +317,7 @@ public class Gui extends JFrame {
                         game.actualGameState.selectedToken = null;
                         refreshTheGui(game.actualGameState);
 
-                        if (currentPlayer != game.actualGameState.currentPlayer) {//Check if current player is changed
+                        if (currentPlayer != game.actualGameState.currentPlayer) {//check if current player is changed
                             timer.setRepeats(false); // Only execute once
                             timer.start();
                         }
