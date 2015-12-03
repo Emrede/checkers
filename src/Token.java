@@ -1,26 +1,25 @@
 import java.util.ArrayList;
 
 /**
- * Created by Emre on 08/11/2015.
+ * Created by Emre on 11/08/2015.
  */
 public class Token {
-
     public int x, y;
     public TokenPlayer player;
     public TokenType tType;
 
-    public enum TokenPlayer {P1, P2};//P1:Black/Player  P2:Red/AI
+    public enum TokenPlayer {P1, P2}//P1:Black/Player  P2:Red/AI
 
-    public enum TokenType {King, Pawn};
+    public enum TokenType {King, Pawn}
 
     public Token() {
         this.x = 0;
         this.y = 0;
         this.player = TokenPlayer.P1;
-        this.tType =TokenType.Pawn;
+        this.tType = TokenType.Pawn;
     }
 
-    public Token(Token token){
+    public Token(Token token) {
 
         this.x = token.x;
         this.y = token.y;
@@ -35,9 +34,7 @@ public class Token {
         this.tType = tType;
     }
 
-
     public static ArrayList<Token> createTokens() {
-
         ArrayList<Token> newToken = new ArrayList<Token>();
         for (int x = 1; x <= 8; x++) {
             for (int y = 1; y <= 3; y++) {
@@ -64,31 +61,23 @@ public class Token {
         return newToken;
     }
 
-    public static ArrayList<Token> createTestingTokens() {
+    public static ArrayList<Token> createTestingTokens() { //Created for testing.
         ArrayList<Token> newTokens = new ArrayList<Token>();
-        //p1 tokens
-        newTokens.add(new Token(2,2,TokenPlayer.P1,TokenType.King));
+        //P1 test tokens.
+        newTokens.add(new Token(2, 2, TokenPlayer.P1, TokenType.King));
 
-        //p2 tokens
-        newTokens.add(new Token(2,8,TokenPlayer.P2,TokenType.Pawn));
-//        newTokens.add(new Token(2,6,TokenPlayer.P2,TokenType.Pawn));
-//        newTokens.add(new Token(1,7,TokenPlayer.P2,TokenType.Pawn));
-        newTokens.add(new Token(2,4,TokenPlayer.P2,TokenType.Pawn));
-
-
+        //P2 test tokens.
+        newTokens.add(new Token(2, 8, TokenPlayer.P2, TokenType.Pawn));
+        newTokens.add(new Token(2, 6, TokenPlayer.P2, TokenType.Pawn));
+        newTokens.add(new Token(1, 7, TokenPlayer.P2, TokenType.Pawn));
+        newTokens.add(new Token(2, 4, TokenPlayer.P2, TokenType.Pawn));
 
         return newTokens;
     }
 
-    //returns the opposing player
-    public static TokenPlayer getOpposingPlayer(TokenPlayer p){
-        if(p==TokenPlayer.P1) return TokenPlayer.P2;
+    //Returns the opposing player
+    public static TokenPlayer getOpposingPlayer(TokenPlayer p) {
+        if (p == TokenPlayer.P1) return TokenPlayer.P2;
         else return TokenPlayer.P1;
     }
-
-
-
 }
-
-
-

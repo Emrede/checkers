@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 /**
- * Created by Emre on 11/8/2015.
+ * Created by Emre on 11/08/2015.
  */
 
 public class Gui extends JFrame {
@@ -24,7 +24,7 @@ public class Gui extends JFrame {
     int targetX, targetY;
     Component frame;
     boolean helpClicked = false;
-    final int SleepDuration = 1500;//[ms]
+    final int DelayDuration = 1000;//[ms] //AI delay duration
 
 
     public Gui(Game instance) throws HeadlessException {
@@ -57,7 +57,7 @@ public class Gui extends JFrame {
         //Initialise the buttons.
         JButton bRules = new JButton("Game Rules");
         JLabel labelDif = new JLabel("Difficulty:");
-        JButton pauseButton = new JButton("Pause");
+        final JButton aiButton = new JButton("Change P1/AI");
         JButton helpButton = new JButton("Help");
         JButton restartButton = new JButton("Restart");
 
@@ -67,7 +67,7 @@ public class Gui extends JFrame {
         JRadioButton difHard = new JRadioButton("Hard");
         difMedium.setSelected(true); //Default difficulty: Medium.
         //Underlines the first letter and assign a keyboard shortcut(Alt+E).
-        difEasy.setMnemonic(KeyEvent.VK_E);
+        difEasy.setMnemonic(KeyEvent.VK_E);//Keyboard shortcuts: Alt + Initials.
         difMedium.setMnemonic(KeyEvent.VK_M);
         difHard.setMnemonic(KeyEvent.VK_H);
 
@@ -97,7 +97,6 @@ public class Gui extends JFrame {
                 }
             }
         });
-
         //Radio button listener functions. They change the difficultyLevel.
         difEasy.addMouseListener(new MouseAdapter() {
             @Override
@@ -135,7 +134,7 @@ public class Gui extends JFrame {
                 else
                     allowedMoves = null;
                 helpClicked = true;
-                game.actualGameState.selectedToken=null;
+                game.actualGameState.selectedToken = null;
                 refreshTheGui(game.actualGameState);
             }
         });
@@ -147,24 +146,21 @@ public class Gui extends JFrame {
                 super.mouseClicked(e);
             }
         });
-
         //Pause button listener.
-        pauseButton.addMouseListener(new MouseAdapter() {
+        aiButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-
-                if (game.isGamePaused == false) {
-                    game.isGamePaused = true;
-                    pauseButton.setText("Continue");
-
+                if (game.aiActive == true) {
+                    game.aiActive = false;
+                    aiButton.setText("Change P1/AI");
                 } else {
-                    game.isGamePaused = false;
-                    pauseButton.setText("Pause");
+                    game.aiActive = true;
+                    aiButton.setText("Change P1/AI");
                 }
+                aiVSai(game.aiActive);
             }
         });
-
         //Adds the buttons and label to the flow panel
         flowPanel.add(labelDif);
         flowPanel.add(difEasy);
@@ -172,13 +168,12 @@ public class Gui extends JFrame {
         flowPanel.add(difHard);
         flowPanel.add(bRules);
         flowPanel.add(helpButton);
-        flowPanel.add(pauseButton);
+        flowPanel.add(aiButton);
         flowPanel.add(restartButton);
         flowPanel.add(labelInfo);
         //Orders the buttons left to right.
         flowPanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-
-        //Puts the flow panel which contains the buttons into the south of a borderpanel.
+        //Puts the flow panel which contains the buttons into the south of a border panel.
         borderPanel.add(flowPanel, BorderLayout.SOUTH);
         //Puts the game board grid panel to the center of a border panel.
         borderPanel.add(gridPanel, BorderLayout.CENTER);
@@ -199,13 +194,12 @@ public class Gui extends JFrame {
                 else
                     square.setBackground(Color.LIGHT_GRAY);
 
-
-                square.getAccessibleContext().setAccessibleName(x + "," + y);//give each square a name which includes its coordinates
+                square.getAccessibleContext().setAccessibleName(x + "," + y);//Give each square a name which includes its coordinates
                 square.addMouseListener(new MouseAdapter() {
                     @Override
-                    public void mouseClicked(MouseEvent e) {//get clicked square on the board
+                    public void mouseClicked(MouseEvent e) {//Get clicked square on the board
 
-                        squareClicked((JPanel) e.getComponent());//get the coordinates from square context);
+                        squareClicked((JPanel) e.getComponent());//Get the coordinates from square context);
                     }
                 });
                 gridPanel.add(square);
@@ -213,7 +207,11 @@ public class Gui extends JFrame {
         }
     }
 
-    //Debug function. Used for test.
+    void aiVSai(boolean a) {
+        timer.setRepeats(a); // Only execute once
+        timer.start();
+    }
+//    Debug function. Used for test.
 //    void placeToken(int x, int y) {
 //        int squareIndex = getGridIndexFromCoordinates(x, y);
 //        Square square = (Square) this.gridPanel.getComponent(squareIndex);
@@ -231,8 +229,7 @@ public class Gui extends JFrame {
         return squareIndex;
     }
 
-
-    Timer timer = new Timer(SleepDuration, new ActionListener() {
+    Timer timer = new Timer(DelayDuration, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             Token.TokenPlayer currentPlayer = game.actualGameState.currentPlayer;
@@ -241,12 +238,11 @@ public class Gui extends JFrame {
             if (minimax.move != null) {
                 game.actualGameState.selectedToken = minimax.move.token;
                 Move.move(game.actualGameState, minimax.move);
-                //game.actualGameState.selectedToken=null;
                 refreshTheGui(game.actualGameState);
             }
-
             GameState.GameResult gameResult = GameState.getResult(game.actualGameState);
             if (gameResult != GameState.GameResult.Continue) {
+                timer.setRepeats(false); // Only execute once
                 if (gameResult == GameState.GameResult.P1Wins) {
                     infoText = "P1 wins. Congrats!";
                     JOptionPane.showMessageDialog(frame, "P1 Wins!");
@@ -258,10 +254,11 @@ public class Gui extends JFrame {
                 refreshTheGui(game.actualGameState);
                 return;
             }
-
-            if (game.actualGameState.currentPlayer == currentPlayer) {//Move until current player changes. In case of multistep move
-                timer.setRepeats(false); // Only execute once
-                timer.start();
+            if (game.aiActive != true) {//If AI vs AI active, skip here
+                if (game.actualGameState.currentPlayer == currentPlayer) {//Move until current player changes. In case of multistep move
+                    timer.setRepeats(false); // Only execute once
+                    timer.start();
+                }
             }
         }
     });
@@ -282,10 +279,10 @@ public class Gui extends JFrame {
         System.out.format("Square clicked. x=%d  y=%d \n", x, y);
         selectedX = x;
         selectedY = y;
-        ArrayList<Move> tmpMoves;
-        //Checks all allowed moves and puts them into tmpMoves list.
-        tmpMoves = game.getAllAllowedMoves(game.actualGameState);
-        if (tmpMoves != null) {
+        ArrayList<Move> currentAllowedMoves;
+        //Checks all allowed moves and puts them into currentAllowedMoves list.
+        currentAllowedMoves = game.getAllAllowedMoves(game.actualGameState);
+        if (currentAllowedMoves != null) {
             Token anyToken = game.isThereAnyTokenAtLocation(selectedX, selectedY, game.actualGameState.tokenList);
             if (anyToken != null && anyToken.player == game.actualGameState.currentPlayer) {//If is there a token,
                 game.actualGameState.selectedToken = anyToken; //Select it.
@@ -298,13 +295,13 @@ public class Gui extends JFrame {
         }
         //First select: selectedToken and target reset
         //Second select: target x,y
-        //If tmpMoves contains a move with selected token and target move
+        //If currentAllowedMoves contains a move with selected token and target move
         if (game.actualGameState.isAnyTokenSelected) {
             targetX = x;
             targetY = y;
-            if (tmpMoves != null) {
+            if (currentAllowedMoves != null) {
                 boolean foundCorrectMove = false;
-                for (Move move : tmpMoves) {
+                for (Move move : currentAllowedMoves) {
                     if (move.targetX == targetX
                             && move.targetY == targetY
                             && move.token == game.actualGameState.selectedToken) {
@@ -317,13 +314,12 @@ public class Gui extends JFrame {
                         game.actualGameState.selectedToken = null;
                         refreshTheGui(game.actualGameState);
 
-                        if (currentPlayer != game.actualGameState.currentPlayer) {//check if current player is changed
+                        if (currentPlayer != game.actualGameState.currentPlayer) {//Check if current player is changed
                             timer.setRepeats(false); // Only execute once
                             timer.start();
                         }
                     }
                 }
-
                 if (!foundCorrectMove && !newTokenSelected) {
                     infoText = "Cannot move there!";
                     System.out.println("Cannot move there");
@@ -334,7 +330,7 @@ public class Gui extends JFrame {
         refreshTheGui(game.actualGameState);
     }
 
-    void refreshTheGui(GameState gameState) {//ArrayList<Token> tokenList
+    void refreshTheGui(GameState gameState) {
         //Clears the gridPanel.
         int squareCount = this.gridPanel.getComponentCount();
         for (int i = 0; i < squareCount; i++) {
@@ -343,19 +339,16 @@ public class Gui extends JFrame {
             square.highlightSquare(false);
             square.greenHighlightSquare(false);
         }
-
         //Places the tokens on the grid.
         for (Token token : gameState.tokenList) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(token.x, token.y));
             square.placeToken(token);
         }
-
         //Checks if square is highlighted.
         if (game.actualGameState.selectedToken != null) {
             Square square = (Square) this.gridPanel.getComponent(getGridIndexFromCoordinates(gameState.selectedToken.x, gameState.selectedToken.y));
             square.highlightSquare(true);
         }
-
         if (helpClicked) {//Show all available moves
             if (allowedMoves != null) {
                 for (Move move : allowedMoves) {
@@ -377,18 +370,15 @@ public class Gui extends JFrame {
                 }
             }
         }
-
         if (GameState.getResult(gameState) != GameState.GameResult.P2Wins || GameState.getResult(gameState) != GameState.GameResult.P2Wins) {
             if (game.actualGameState.currentPlayer == Token.TokenPlayer.P1) {
                 labelInfo.setText("Black moves " + infoText);
             } else {
                 labelInfo.setText("Red moves " + infoText);
             }
-        }else{
+        } else {
             labelInfo.setText(infoText);
         }
         this.gridPanel.updateUI();
     }
 }
-
-
