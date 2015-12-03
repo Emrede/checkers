@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 /**
- * Created by Emre on 11/27/2015.
+ * Created by Emre on 11/16/2015.
  */
 public class Move{
     public Token token;//Current token
@@ -21,9 +21,7 @@ public class Move{
         this.targetX = move.targetX;
         this.targetY = move.targetY;
         this.isAnEatingMove = move.isAnEatingMove;
-
     }
-
     /**
      * Moves the token to the correct place.
      * This function does not check if the move is a valid one.
@@ -50,13 +48,13 @@ public class Move{
             if(newY == 8 || newY ==1){//Check if token becomes a king
                 movement.token.tType = Token.TokenType.King;
             }
-            gameState.tokenList.remove(tokenToBeEaten);//remove the eaten token from the list
+            gameState.tokenList.remove(tokenToBeEaten);//Remove the eaten token from the list
 
-            //Check if this token can eat another token(multistep)
+            //Check if this token can eat another token (Multistep)
             ArrayList<Move> tmpMoveList;
             tmpMoveList = Game.getPossibleMovesForToken(gameState, movement.token);
-            if (tmpMoveList == null) {//no more moves possible
-                gameState.multiStepMoveOnGo = false;//multistep finished or not possible
+            if (tmpMoveList == null) {//No more moves possible
+                gameState.multiStepMoveOnGo = false;//Multistep finished or not possible
                 gameState.multiStepToken = null;
                 gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
             } else {//Check if token can eat more tokens at the new location
@@ -82,8 +80,7 @@ public class Move{
             gameState.currentPlayer = Token.getOpposingPlayer(gameState.currentPlayer);
         }
     }
-
-    //finds a move in a list. Move is in a different instance of game state.
+    //Finds a move in a list. Move is in a different instance of game state.
     public static Move matchMoveBetweenStates(ArrayList<Move> moveList,  Move moveToBeFound){
         for(Move move:moveList){
             if(move.targetX == moveToBeFound.targetX){
@@ -98,5 +95,4 @@ public class Move{
         }
         return null;
     }
-
 }

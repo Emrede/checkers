@@ -30,7 +30,6 @@ public class Square extends JPanel {
         else isGreenHighlighted = false;
     }
 
-
     @Override
     public void paint(Graphics g) {
         super.paint(g);
@@ -44,7 +43,6 @@ public class Square extends JPanel {
                 g.setColor(Color.red);
             }
             g.fillOval(diff, diff, height, height);
-
             //Checks if the token is a king
             if (occupant.tType == Token.TokenType.King) {
                 height = (int) (squareHeight * 0.45);
@@ -52,24 +50,19 @@ public class Square extends JPanel {
                 g.setColor(Color.orange);
                 g.fillOval(diff, diff, height, height);
             }
-
             //Checks if the square is highlighted
-
             if (isGreenHighlighted) {
                 height = (int) (squareHeight * 0.9);
                 diff = (squareHeight - height) / 2;
                 g.setColor(Color.green);
                 g.drawRect(diff, diff, height, height);
-            }
-            else if(isHighlighted){
+            } else if (isHighlighted) {
                 height = (int) (squareHeight * 0.9);
                 diff = (squareHeight - height) / 2;
                 g.setColor(Color.orange);
                 g.drawRect(diff, diff, height, height);
             }
-
         } else {
-
             if (isGreenHighlighted) {
                 height = (int) (squareHeight * 0.9);
                 diff = (squareHeight - height) / 2;

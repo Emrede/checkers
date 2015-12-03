@@ -1,14 +1,12 @@
 import java.util.ArrayList;
 
 /**
- * Created by Emre on 11/26/2015.
+ * Created by Emre on 11/16/2015.
  */
 
 //A game instance
 public class GameState {
-    public enum GameResult {P1Wins, P2Wins, Draw, Continue}
-
-    ;
+    public enum GameResult {P1Wins, P2Wins, Continue}
 
     public Token.TokenPlayer currentPlayer;
     public Token selectedToken;
@@ -22,9 +20,7 @@ public class GameState {
         for (Token token : tokenList) {
             this.tokenList.add(token);
         }
-
     }
-
     public GameState(GameState gameState) {
         this.currentPlayer = Token.TokenPlayer.values()[gameState.currentPlayer.ordinal()];
         if (gameState.selectedToken != null) this.selectedToken = new Token(gameState.selectedToken);
@@ -37,8 +33,6 @@ public class GameState {
         this.multiStepMoveOnGo = gameState.multiStepMoveOnGo;
         if (gameState.multiStepToken != null) this.multiStepToken = new Token(gameState.multiStepToken);
     }
-
-
     public static int getScore(GameState gamestate) {
         int score = 0;
         for (Token token : gamestate.tokenList) {
@@ -56,14 +50,12 @@ public class GameState {
                 }
             }
         }
-
         GameResult gameResult = getResult(gamestate);
-        if(gameResult == GameResult.P1Wins) score -= 50;//Winning the game counts as 50
-        if(gameResult == GameResult.P2Wins) score += 50;
+        if (gameResult == GameResult.P1Wins) score -= 50;//Winning the game counts as 50
+        if (gameResult == GameResult.P2Wins) score += 50;
         System.out.println(score);
         return score;
     }
-
     public static GameResult getResult(GameState gameState) {
         //Check tokens
         boolean p1TokenFound = false;
@@ -73,23 +65,17 @@ public class GameState {
             if (token.player == Token.TokenPlayer.P1) p1TokenFound = true;
             else p2TokenFound = true;
         }
-        //If a player does not have anymore tokens other pllayer wins
+        //If a player does not have any tokens other player wins
         if (!p1TokenFound) return GameResult.P2Wins;
         if (!p2TokenFound) return GameResult.P1Wins;
 
         //Check possible moves to see if the current player can move
         ArrayList<Move> tmpMoveList = Game.getAllAllowedMoves(gameState);
         if (tmpMoveList == null) {
-            //No possible moves! current player can not move so opposing player wins
+            //No possible moves! Current player can not move so opposing player wins.
             if (gameState.currentPlayer == Token.TokenPlayer.P1) return GameResult.P2Wins;
             else return GameResult.P1Wins;
         }
-
-        //Draw conditions are not checked.
-        //Currently draw not possible
         return GameResult.Continue;
-
     }
-
-
 }
